@@ -8,10 +8,10 @@ Board Database:
 	id					(integer key)
 	name				(varchar 256)
 	imageheader			(varchar) [URL of image]
-	shortname 			(varchar) 
+	shortname			(varchar) 
 	description			(text)
 	creator				(1 to 1 user_id)
-	thread 				(1 to many thread_id)
+	thread				(1 to many thread_id)
 	subscribers			(1 to many user_id)
 	board_moderators	(1 to many user_id)
 	board_post_count	(integer)
@@ -27,42 +27,42 @@ user database:
 	image_header		(varchar)
 	is_banned			(integer foreign key bans)
 	mod_of				(1 to many board_database_id)
-	is_site_moderator	(integer)
+	moderator_type		(integer) [0 = superadmin, 1 = regular account]
 	subscribed_to		(1 to many board_database_id)
 	creation_timestamp	(timestamp)
 
 comment database: 
 
-	post_number 		(primary key integer of the post number in the thread)
+	post_number			(primary key integer of the post number in the thread)
 	comment_UUID		(UUID)
 	thread UUID			(UUID)
 	poster_id			(1 to 1 user_id)
 	replies				(1 to 1000 comment_id)
-	replied_to 			(1 to many comment_id)
-	post 				(text)
+	replied_to			(1 to many comment_id)
+	post				(text)
 	timestamp			(date_timestamp)
 	tag					(string optional identifier)
 
 pools:
 
-	id
+	id					(primary key integer of the post number in the thread)
 	thread_name			(varchar)
 	thread_text			(text)
 	thread_poster		(1 to 1 user_id)
 	thread_replies		(1 to many)
-	thread_images 		(1 to many)
+	thread_images		(1 to many)
 	thread_timestamp	timestamp
 	thread_UUID			UUID
 
 threads:
 
-	id
+	id					(primary key integer of the post number in the thread)
 	thread_name			(varchar)
 	thread_text			(text)
 	thread_poster		(1 to 1 user_id)
 	thread_replies		(1 to many)
 	reply_count			(integer)
-	thread_images 		(1 to many)
+	thread_images		(1 to many)
 	thread_timestamp	timestamp
 	thread_UUID			UUID
 	
