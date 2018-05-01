@@ -21,7 +21,7 @@ user database:
 
 	id					(primary key integer)
 	username			(varchar)
-	password_hash		(varchar)
+	password			(varchar)
 	ip_address			(varchar)
 	email				(varchar)
 	image_header		(varchar)
@@ -75,8 +75,3 @@ bans:
 	ban_end			(timestamp)
 	ban_begin		(timestamp)
 	ban_reason		(text)
-	
-thread_most_recent:
-
-	id				(thread_id primary key)
-	most_recent		(timestamp)
