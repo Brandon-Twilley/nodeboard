@@ -1,0 +1,82 @@
+Messaging board: 
+
+landingpage_database: 
+
+
+Board Database: 
+
+	id					(integer key)
+	name				(varchar 256)
+	imageheader			(varchar) [URL of image]
+	shortname 			(varchar) 
+	description			(text)
+	creator				(1 to 1 user_id)
+	thread 				(1 to many thread_id)
+	subscribers			(1 to many user_id)
+	board_moderators	(1 to many user_id)
+	board_post_count	(integer)
+	board_reply_count	(integer)
+
+user database: 
+
+	id					(primary key integer)
+	username			(varchar)
+	password_hash		(varchar)
+	ip_address			(varchar)
+	email				(varchar)
+	image_header		(varchar)
+	is_banned			(integer foreign key bans)
+	mod_of				(1 to many board_database_id)
+	is_site_moderator	(integer)
+	subscribed_to		(1 to many board_database_id)
+	creation_timestamp	(timestamp)
+
+comment database: 
+
+	post_number 		(primary key integer of the post number in the thread)
+	comment_UUID		(UUID)
+	thread UUID			(UUID)
+	poster_id			(1 to 1 user_id)
+	replies				(1 to 1000 comment_id)
+	replied_to 			(1 to many comment_id)
+	post 				(text)
+	timestamp			(date_timestamp)
+	tag					(string optional identifier)
+
+pools:
+
+	id
+	thread_name			(varchar)
+	thread_text			(text)
+	thread_poster		(1 to 1 user_id)
+	thread_replies		(1 to many)
+	thread_images 		(1 to many)
+	thread_timestamp	timestamp
+	thread_UUID			UUID
+
+threads:
+
+	id
+	thread_name			(varchar)
+	thread_text			(text)
+	thread_poster		(1 to 1 user_id)
+	thread_replies		(1 to many)
+	reply_count			(integer)
+	thread_images 		(1 to many)
+	thread_timestamp	timestamp
+	thread_UUID			UUID
+	
+bans:
+
+	id 				(primary key integer)
+	ip_address		(varchar)
+	username		(1 to 1 user_id)
+	banner			(1 to 1 user_id)
+	ban_end			(timestamp)
+	ban_begin		(timestamp)
+	ban_reason		(text)
+	
+thread_most_recent:
+
+	id				(thread_id primary key)
+	most_recent		(timestamp)
