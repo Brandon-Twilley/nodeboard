@@ -18,6 +18,7 @@ const api = require('./src/routes/api/api');
 const bans = require('./src/routes/bans/bans');
 const boards = require('./src/routes/boards/boards');
 const users = require('./src/routes/users/users');
+const rules = require('./src/routes/rules/rules');
 const port = 3000;
 
 //Public folder

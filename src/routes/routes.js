@@ -25,6 +25,7 @@ const users = require('./users/users');
 const login = require('./users/login/login');
 const signup = require('./users/login/signup');
 const admin = require('./admin/initialize_site.js');
+const rules = require('./rules/rules');
 
 
 router.get('/', function(request, response, next){
@@ -52,6 +53,7 @@ router.use(threads_comments);
 router.use(users);
 router.use(login);
 router.use(signup);
+router.use(rules);
 
 
 module.exports = router;
