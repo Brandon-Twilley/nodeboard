@@ -4,33 +4,77 @@
 	</div>
 </h2>
 <div class="ui inverted attached segment" style="border-radius: 0px;">
-	<div class="field">
-		<div class="ui left icon input">
-			<i class="user inverted icon"></i>
-			<input type="text" name="email" placeholder="E-mail address" style="border-radius: 0px; background-color: transparent; border: 1px solid #4e4e4e">
-		</div>
-	</div>
 	
 	<div class="field">
 		<div class="ui left icon input">
 			<i class="user inverted icon"></i>
-			<input type="text" name="username" placeholder="Username" style="border-radius: 0px; background-color: transparent; border: 1px solid #4e4e4e">
+			<input type="text" id="username" placeholder="Username" style="border-radius: 0px; background-color: transparent; border: 1px solid #4e4e4e">
 		</div>
 	</div>
 	
 	<div class="field">
 		<div class="ui left icon input">
 			<i class="lock inverted icon"></i>
-			<input type="password" name="password" placeholder="Password" style="border-radius: 0px; background-color: transparent; border: 1px solid #4e4e4e">
+			<input type="password" id="password" placeholder="Password" style="border-radius: 0px; background-color: transparent; border: 1px solid #4e4e4e">
 		</div>
 	</div>
 	
 	<div class="field">
 		<div class="ui left icon input">
 			<i class="lock inverted icon"></i>
-			<input type="password" name="passwordconfirm" placeholder="Confirm Password" style="border-radius: 0px; background-color: transparent; border: 1px solid #4e4e4e">
+			<input type="password" id="passwordconfirm" placeholder="Confirm Password" style="border-radius: 0px; background-color: transparent; border: 1px solid #4e4e4e">
 		</div>
 	</div>
-	<div class="ui fluid large red submit button" style="border-radius: 0px;">Sign up</div>
+	<div id="signup" class="ui fluid large red submit button" style="border-radius: 0px;">Sign up</div>
 </div>
-<div class="ui error message"></div>
+<div id="error_password_mismatch" class="ui red hidden message"><i class="close icon"></i><div class="header">Error</div><p>Your passwords don't match</p></div>
+<div id="error_password_length" class="ui red hidden message"><i class="close icon"></i><div class="header">Error</div><p>Your password must be between 7 and 19 characters long</p></div>
+<div id="error_password_invalid" class="ui red hidden message"><i class="close icon"></i><div class="header">Error</div><p>Your password must be alphanumberic ( only a-z, A-Z, and 0-9)</p></div>
+<div id="error_invalid_username" class="ui red hidden message"><i class="close icon"></i><div class="header">Error</div><p>Your username must be alphanumberic ( only a-z, A-Z, and 0-9)</p></div>
+<div id="error_username_exists" class="ui red hidden message"><i class="close icon"></i><div class="header">Error</div><p>This username already exists</p></div>
+<div id="error_username_length" class="ui red hidden message"><i class="close icon"></i><div class="header">Error</div><p>Your username must be between 4 and 19 characters long</p></div>
+
+<script>
+	$(document).ready(function(){
+		
+		$('.message .close').on('click', function() {
+			$(this).parent().addClass('hidden');
+		});
+		
+		
+		
+		$('#signup').click(function(){
+			let username = $('#username').val();
+			let password = $('#password').val();
+			let passwordconfirm = $('#passwordconfirm').val();
+			
+			
+			if(password == passwordconfirm){
+				console.log('passwords match');
+				
+				//password validation
+				if( /[^a-zA-Z0-9]/.test( password ) ) {
+					$('#error_password_invalid').removeClass('hidden');
+					
+				} else {
+					if(password.length > 19 || password.length < 7){
+						$('#error_password_length').removeClass('hidden');
+					}
+				}
+				
+			} else {
+				$('#error_password_mismatch').removeClass('hidden');
+			}
+			
+			if(username.length < 4 || username.length > 19){
+				$('#error_username_length').removeClass('hidden');
+			} else {
+				if (/[^a-zA-Z0-9]/.test( username )){
+					$('#error_invalid_username').removeClass('hidden');
+				} else {
+					//TODO: make call to database to check if username exists
+				}
+			}
+		});
+	});
+</script>
