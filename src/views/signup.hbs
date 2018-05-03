@@ -1,3 +1,24 @@
+{{#if logged_in}}
+<h2 class="ui red inverted top attached header" style="margin-top: 3em; border-radius: 0px ;text-align: center;">
+	<div class="content" style="text-align: center; border-radius: 0px;">
+		
+	</div>
+</h2>
+<div class="ui inverted attached segment" style="border-radius: 0px;">
+	
+	<div id="signup" class="ui fluid large red submit button" style="border-radius: 0px;">You are already logged in</div>
+</div>
+<script>
+	$(document).ready(function(){
+		
+		
+		$('#signup').click(function(){
+			
+			window.location.href = '/';
+		});
+	});
+</script>
+{{else}}
 <h2 class="ui red inverted top attached header" style="margin-top: 3em; border-radius: 0px ;text-align: center;">
 	<div class="content" style="text-align: center; border-radius: 0px;">
 		
@@ -78,3 +99,4 @@
 		});
 	});
 </script>
+{{/if}}

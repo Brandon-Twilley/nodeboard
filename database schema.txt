@@ -68,6 +68,8 @@ threads table:
 	thread_UUID			UUID
 	
 TODO: create database table for thread replies.
+
+
 bans table:
 
 	id 				(primary key integer)

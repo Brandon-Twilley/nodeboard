@@ -1,24 +1,97 @@
 <h2 class="ui red inverted top attached header" style="margin-top: 3em; border-radius: 0px ;text-align: center;">
 	<div class="content" style="text-align: center; border-radius: 0px;">
-		Admin Login
 	</div>
 </h2>
+{{#if logged_in}}
+<div class="ui inverted attached segment" style="border-radius: 0px;">
+	<div class="field">
+	</div>
+	<div id="logout" class="ui fluid large red submit button" style="border-radius: 0px;">Log Out</div>
+</div>
+
+<div class="ui inverted message" style="border-radius: 0px; text-align: center; color: red;">
+	<a href="login/signup" style="color: red;">Sign Up</a>
+</div>
+<script>
+	$(document).ready(function(){
+		
+		var theCookies = document.cookie.split(';');
+		var aString = '';
+		for (var i = 1 ; i <= theCookies.length; i++) {
+			aString += i + ' ' + theCookies[i-1] + "\n";
+		}
+		console.log(aString);
+		
+		$('#logout').click(function(){
+			document.cookie = "username=; path=/; ";
+			document.cookie = "password=; path=/; ";
+			
+			var theCookies = document.cookie.split(';');
+			var aString = '';
+			for (var i = 1 ; i <= theCookies.length; i++) {
+				aString += i + ' ' + theCookies[i-1] + "\n";
+			}
+			console.log(aString);
+			location.reload();
+		});
+	});
+</script>
+{{else}}
+
 <div class="ui inverted attached segment" style="border-radius: 0px;">
 	<div class="field">
 		<div class="ui left inverted icon input">
 			<i class="user inverted icon"></i>
-			<input type="text" name="email" placeholder="E-mail address" style="border-radius: 0px; background-color: transparent; border: 1px solid #4e4e4e">
+			<input type="text" id="username" name="username" placeholder="Username" style="border-radius: 0px; background-color: transparent; border: 1px solid #4e4e4e">
 		</div>
 	</div>
 	<div class="field">
 		<div class="ui left inverted icon input">
 			<i class="lock inverted icon"></i>
-			<input type="password" name="password" placeholder="Password" style="border-radius: 0px; background-color: transparent; border: 1px solid #4e4e4e;">
+			<input id="password" type="password" name="password" placeholder="Password" style="border-radius: 0px; background-color: transparent; border: 1px solid #4e4e4e;">
 		</div>
 	</div>
-	<div class="ui fluid large red submit button" style="border-radius: 0px;">Login</div>
+	<div id="login_button" class="ui fluid large red submit button" style="border-radius: 0px;">Login</div>
 </div>
-<div class="ui error message"></div>
+
 <div class="ui inverted message" style="border-radius: 0px; text-align: center; color: red;">
 	<a href="login/signup" style="color: red;">Sign Up</a>
 </div>
+<script>
+	$(document).ready(function(){
+		
+		var theCookies = document.cookie.split(';');
+		var aString = '';
+		for (var i = 1 ; i <= theCookies.length; i++) {
+			aString += i + ' ' + theCookies[i-1] + "\n";
+		}
+		console.log(aString);
+		
+		$('#login_button').click(function(){
+			let username = $('#username').val();
+			let password = $('#password').val();
+			let data = {}
+			data.username = username;
+			data.password = password;
+			$.post("/api/users/login", data, function(data, status){
+				console.log('data: ' + data + ' status: ' + status);
+				response_object = JSON.parse(data);
+				if(response_object.success){
+					document.cookie = "username=" + username + "; path=/;";
+					document.cookie = "password=" + password + "; path=/";
+					
+					var theCookies = document.cookie.split(';');
+					var aString = '';
+					for (var i = 1 ; i <= theCookies.length; i++) {
+						aString += i + ' ' + theCookies[i-1] + "\n";
+					}
+					console.log(aString);
+					
+					location.reload();
+				}
+			});
+		});
+	});
+</script>
+
+{{/if}}

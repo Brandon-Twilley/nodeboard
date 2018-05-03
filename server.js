@@ -39,6 +39,7 @@ app.use(express.static(path.join(__dirname, 'src/public')));
 app.use('/', index);
 app.use(routes);
 
+
 //catch 404 pages
 app.use(function(request, response, next){
 	var err = new Error('Not Found');
