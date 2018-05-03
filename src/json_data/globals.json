@@ -1,5 +1,7 @@
 {
-	"title": "Rules: ",
+	"title": "",
+	"username": "",
+	"logged_in": false,
 	"rule": [
 		"You will not upload, post, discuss, request, or link to anything that violates local or United States law.",
 		"You will immediately cease and not continue to access the site if you are under the age of 18.",

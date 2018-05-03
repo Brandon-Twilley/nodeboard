@@ -30,6 +30,7 @@ const rules = require('./rules/rules');
 
 router.get('/', function(request, response, next){
 	response.render('index', { title: 'Express imageboard' });
+	console.log('cookies: ', request.cookies);
 });
 
 //api endpoints

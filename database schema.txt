@@ -3,7 +3,7 @@ Messaging board:
 landingpage_database: 
 
 
-Board Database: 
+Board table: 
 
 	id					(integer key)
 	name				(varchar 256)
@@ -11,27 +11,27 @@ Board Database:
 	shortname			(varchar) 
 	description			(text)
 	creator				(1 to 1 user_id)
-	thread				(1 to many thread_id)
-	subscribers			(1 to many user_id)
-	board_moderators	(1 to many user_id)
 	board_post_count	(integer)
 	board_reply_count	(integer)
+	
+TODO: create database table linking the boards with the threads
+TODO: create database table linking the boards with the moderators
 
-user database: 
+user table: 
 
 	id					(primary key integer)
 	username			(varchar)
 	password			(varchar)
 	ip_address			(varchar)
-	email				(varchar)
 	image_header		(varchar)
-	is_banned			(integer foreign key bans)
+	is_banned			(integer) [1 = banned, 0 = not banned]
 	mod_of				(1 to many board_database_id)
 	moderator_type		(integer) [0 = superadmin, 1 = regular account]
-	subscribed_to		(1 to many board_database_id)
 	creation_timestamp	(timestamp)
+	
+TODO: create database table linking the user to the boards they're moderating
 
-comment database: 
+comment table: 
 
 	post_number			(primary key integer of the post number in the thread)
 	comment_UUID		(UUID)
@@ -43,30 +43,34 @@ comment database:
 	timestamp			(date_timestamp)
 	tag					(string optional identifier)
 
-pools:
+pools table:
 
 	id					(primary key integer of the post number in the thread)
-	thread_name			(varchar)
+	pool_uuid			(varchar(36))
+	pool_name			(varchar)
 	thread_text			(text)
 	thread_poster		(1 to 1 user_id)
-	thread_replies		(1 to many)
-	thread_images		(1 to many)
 	thread_timestamp	timestamp
-	thread_UUID			UUID
+	
+TODO: create database table for pools replies
+TODO: create database table that holds all the images for the person that started the pools thread
 
-threads:
+
+threads table:
 
 	id					(primary key integer of the post number in the thread)
 	thread_name			(varchar)
 	thread_text			(text)
 	thread_poster		(1 to 1 user_id)
 	thread_replies		(1 to many)
-	reply_count			(integer)
 	thread_images		(1 to many)
 	thread_timestamp	timestamp
 	thread_UUID			UUID
 	
-bans:
+TODO: create database table for thread replies.
+
+
+bans table:
 
 	id 				(primary key integer)
 	ip_address		(varchar)

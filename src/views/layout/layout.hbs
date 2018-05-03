@@ -60,8 +60,8 @@
 			color: white !important;
 			background-color: #00000052 !important;
 		}
-		.item:before{
-			margin-left: -2.25em !important;
+		.attached.header {
+			text-align: center;
 		}
 	</style>
 	
@@ -72,7 +72,14 @@
 			<a href="/" class="item">Home</a>
 			<a href="/rules" class="item">Rules</a>
 			<a href="/boards/view" class="item">Boards</a>
+			{{#if logged_in}}
+			<a class="right item" style="padding: 0em;">
+				<a class="item">{{ username }}</a>
+				<a href="/users/login" class="item">Sign-out</a>
+			</a>
+			{{else}}
 			<a href="/users/login" class="right item">Sign-in</a>
+			{{/if}}
 		</div>
 			<form class="ui inverted middle aligned center aligned large form" style="margin-top: 8em; margin-left: 5em; margin-right: 5em;">
 		{{{ body }}}
