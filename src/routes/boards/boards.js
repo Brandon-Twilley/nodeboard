@@ -13,7 +13,6 @@ router.get('/boards/view/', function(request, response, next){
 })
 
 router.get('/boards/add', function(request, response, next){
-
 	var object = {};
 	init.setup_webpage_object(object, request, function(object){
 		object.title = "add board";
