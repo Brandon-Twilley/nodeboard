@@ -38,10 +38,13 @@
 	<link rel="stylesheet" type="text/css" href="/css/semanticui/icon.css">
 	<link rel="stylesheet" type="text/css" href="/css/semanticui/table.css">
 	<link rel="stylesheet" type="text/css" href="/css/semanticui/list.css">
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.1/components/loader.css">
+	
 	<script src="/js/jquery/1.8.3/jquery.min.js"></script>
 	<style type="text/css">
 		body {
 			background-color: #DADADA;
+			font-family: monospace !important;
 		}
 		body > .grid {
 			height: 100%;
@@ -60,6 +63,9 @@
 			color: white !important;
 			background-color: #00000052 !important;
 		}
+		.inverted_loading {
+			background-color: #00000052 !important;
+		}
 		.attached.header {
 			text-align: center;
 		}
@@ -68,7 +74,7 @@
 <body style="background-color: black;">
 	<div class="ui middle aligned center aligned grid">
 		<div class="ui container" style="width: 1100px; max-width 80%;">
-		<div class="ui inverted middle aligned center aligned top fixed grid menu">
+		<div class="ui inverted middle aligned center aligned top fixed grid menu" style="font-family: monospace; ">
 			<a href="/" class="item">Home</a>
 			<a href="/rules" class="item">Rules</a>
 			<a href="/boards/view" class="item">Boards</a>
