@@ -1,14 +1,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const logger = require('morgan');
 const favicon = require('serve-favicon');
 const cookieParser = require('cookie-parser');
 const path = require('path');
 const hbs = require('express-handlebars');
-const db = require('node-mysql');
-const DB = db.DB;
-const BaseRow = db.Row;
-const BaseTable = db.Table;
+const raven = require('raven');
 
 const routes = require('./src/routes/routes');
 const app = express();
@@ -22,6 +18,10 @@ const rules = require('./src/routes/rules/rules');
 const port = 3000;
 
 //Public folder
+raven.config('https://ca5cd013c6f54041afc7db7d2ff5b113@sentry.io/1204185').install();
+app.use(raven.requestHandler());
+app.use(raven.errorHandler());
+
 app.engine('hbs', hbs({extname: 'hbs', defaultLayout: 'layout', layoutsDir: __dirname + '/src/views/layout/'} ));
 app.set('views', path.join(__dirname, 'src/views'));
 app.set('view engine', 'hbs');
@@ -29,16 +29,22 @@ app.set('view engine', 'hbs');
 //uncomment after you've found a favicon and placed it in your /public folder.
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(express.static('./src/public'));
-app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'src/public')));
 
-
 app.use('/', index);
 app.use(routes);
 
+app.get('/', function mainHandler(req, res){
+	throw new Error('Broke!');
+});
+
+app.use(function onError(err, req, res, next){
+	res.statusCode = 500;
+	res.end(res.sentry + '\n');
+})
 
 //catch 404 pages
 app.use(function(request, response, next){
