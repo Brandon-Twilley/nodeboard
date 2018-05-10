@@ -2,30 +2,26 @@
 	"title": "",
 	"username": "",
 	"logged_in": false,
-	"create_board": {
-		"name": "",
-		"imageheader": "",
-		"shortname": "",
-		"description": "",
-		"creator": 0,
-		"board_post_count": 0,
-		"board_reply_count": 0,
-		"tablename": ""
-	}
+	"success_message": {
+		"success": true,
+		"message": ""
+	},
+	"request_object": {},
+	"response_object": {},
 	"thread": {
-			"main_post": {
-				"id": "",
-				"title": "",
-				"comment": "",
-				"poster": "",
-				"main_post_images": [],
-				"timestamp": "",
-				"thread_UUID": "",
-				"ip_address": "",
-				"images": []
-			},
-			"comments": []
+		"main_post": {
+			"id": "",
+			"title": "",
+			"comment": "",
+			"poster": "",
+			"main_post_images": [],
+			"timestamp": "",
+			"thread_UUID": "",
+			"ip_address": "",
+			"images": []
 		},
+		"comments": []
+	},
 	"rule": [
 		"You will not upload, post, discuss, request, or link to anything that violates local or United States law.",
 		"You will immediately cease and not continue to access the site if you are under the age of 18.",

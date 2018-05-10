@@ -11,23 +11,44 @@
 		</thead>
 		<tbody>
 			<tr>
-				<td><input style="border-radius: 0px; color: white; background: #00000052;" type="text"></td>
-				<td><span style="font-size: 24px;">/</span><input style="border-radius: 0px; color: white; background: #00000052; width: calc( 100% - 18px ) !important;" type="text"><span style="font-size: 24px;">/</span></td>
-				<td><input style="border-radius: 0px; color: white; background: #00000052;" type="text"></td>
+				<td><input id="name" style="border-radius: 0px; color: white; background: #00000052;" type="text"></td>
+				<td><span style="font-size: 24px;">/</span><input id="shortname" style="border-radius: 0px; color: white; background: #00000052; width: calc( 100% - 31px ) !important;" type="text"><span style="font-size: 24px;">/</span></td>
+				<td><input id="imageheader" style="border-radius: 0px; color: white; background: #00000052;" type="text"></td>
 			</tr>
 		</tbody>
 	</table>
 	<div class="field" style="padding: 1em; background-color: #333333;">
 		<label style="text-align: center;">Description</label>
-		<textarea class="inverted" style="background: #00000052; color: white; margin-top: 0px; margin-bottom: 0px; height: 112px; border-radius: 0px;"></textarea>
+		<textarea id="description" class="inverted" style="background: #00000052; color: white; margin-top: 0px; margin-bottom: 0px; height: 112px; border-radius: 0px;"></textarea>
 		<div id="submit_add" class="ui inverted right button" style="text-align: center; border-radius: 0px; margin: 1em; margin-left: calc( 50% - 43px );">Submit</div>
 	</div>
 </div>
+<script>
+	$(document).ready(function(){
+		$('#submit_add').click(function(){
+			let data_to_post = {
+				description: "",
+				imageheader: "",
+				name: "",
+				shortname: ""
+			};
+			data_to_post.description = $('#description').val();
+			data_to_post.imageheader = $('#imageheader').val();
+			data_to_post.name = $('#name').val();
+			data_to_post.shortname = $('#shortname').val();
+			console.log('clicked submit');
+
+			$.post('/api/boards/add', data_to_post).done(function(response){
+				console.log(response);
+			});
+		});
+	});
+</script>
 {{else}}
 <h5 class="ui center red inverted top attached header" style="border-radius: 0px;"></h5>
 <div class="ui center inverted attached segment" style="border-radius: 0px;">
 	<p>
-		You cannot create a board if you're not logged in.
+		Login to create a board.
 		<a id="signup" href="/users/login" class="ui fluid large red submit button" style="border-radius: 0px; margin-top: 1em; ">Login here</a>
 	</p>
 </div>

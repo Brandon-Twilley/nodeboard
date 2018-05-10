@@ -11,8 +11,8 @@ router.get('/thread', function(request, response, next){
 	var object = {};
 	init.setup_webpage_object(object, request, function(object){
 		object.title = "Thread";
-		init.get_threads_comments(object, request, function(object){
-			console.log(JSON.stringify(object.thread));
+		init.get_threads_comments(object, function(object){
+			console.log(JSON.stringify(object));
 			response.render('thread/view', object);
 		});
 	});
