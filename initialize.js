@@ -75,7 +75,7 @@ exports.setup_webpage_object = function(webpage_object, request, callback){
 					}
 					
 					console.log('logged in: ' + webpage_object.logged_in);
-					
+					console.log(JSON.stringify(webpage_object.response_object));
 					callback(webpage_object);
 				});
 			});
@@ -265,7 +265,7 @@ exports.create_board = function(webpage_object, callback){
 	}
 }
 
-exports.get_boards = function(webpage_object, callback){
+exports.get_boards_shortname = function(webpage_object, callback){
 	if(webpage_object.success_message.success == true){
 		let query = [];
 
@@ -281,18 +281,13 @@ exports.get_boards = function(webpage_object, callback){
 
 			con.query("SELECT * FROM boards WHERE shortname = ?;", query, function(err, result){
 				if (err) throw err;
-				if (result.length == 0){
-					webpage_object.success_message.success = false;
-					webpage_object.success_message.message = "There don't exist any boards by that shortname";
-					callback(webpage_object);
-					return;
-				} else {
-					webpage_object.success_message.success = true;
-					webpage_object.success_message.message = "";
-					webpage_object.response_object = result[0];
-					callback(webpage_object);
-					return;
-				}
+				webpage_object.success_message.success = true;
+				webpage_object.success_message.message = "";
+				webpage_object.response_object = {boards: result};
+				console.log('ping 1');
+				callback(webpage_object);
+				return;
+			
 			});
 		});
 	} else {

@@ -18,7 +18,7 @@ const rules = require('./src/routes/rules/rules');
 const port = 3000;
 
 //Public folder
-raven.config('__DSN__').install();
+raven.config('https://ca5cd013c6f54041afc7db7d2ff5b113@sentry.io/1204185').install();
 app.use(raven.requestHandler());
 app.use(raven.errorHandler());
 
@@ -29,7 +29,6 @@ app.set('view engine', 'hbs');
 //uncomment after you've found a favicon and placed it in your /public folder.
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(express.static('./src/public'));
-app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());

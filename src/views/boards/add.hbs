@@ -23,8 +23,33 @@
 		<div id="submit_add" class="ui inverted right button" style="text-align: center; border-radius: 0px; margin: 1em; margin-left: calc( 50% - 43px );">Submit</div>
 	</div>
 </div>
+<div id="error_server_message" class="ui red hidden message"><i class="close icon"></i><div class="header">Error</div><p></p></div>
+<div id="error_shortname_length" class="ui red hidden message"><i class="close icon"></i><div class="header">Error</div><p>Shortname must contain between 1 and 5 characters</p></div>
+<div id="error_shortname_alphanumeric" class="ui red hidden message"><i class="close icon"></i><div class="header">Error</div><p>Shortname must be alphanumeric (0-9, a-z, and A-Z)</p></div>
+<div id="error_name_length" class="ui red hidden message"><i class="close icon"></i><div class="header">Error</div><p>Name must not contain more than 256 characters</p></div>
+<div id="error_imageheader_length" class="ui red hidden message"><i class="close icon"></i><div class="header">Error</div><p>Imageheader link must not contain more than 200 characters</p></div>
+<div id="error_imageheader_url" class="ui red hidden message"><i class="close icon"></i><div class="header">Error</div><p>the imageheader you provided is not a URL.</p></div>
+
+
+
 <script>
 	$(document).ready(function(){
+
+		function isURL(str) {
+			var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+				'((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|'+ // domain name
+				'((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+				'(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+				'(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+				'(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+
+			return pattern.test(str);
+		}
+
+		$('.message .close').on('click', function() {
+			$(this).parent().addClass('hidden');
+		});
+
 		$('#submit_add').click(function(){
 			let data_to_post = {
 				description: "",
@@ -37,10 +62,56 @@
 			data_to_post.name = $('#name').val();
 			data_to_post.shortname = $('#shortname').val();
 			console.log('clicked submit');
+			if(data_to_post.shortname.length < 6 && data_to_post.shortname.length > 0){
 
-			$.post('/api/boards/add', data_to_post).done(function(response){
-				console.log(response);
-			});
+				if( /[^a-zA-Z0-9]/.test( data_to_post.shortname ) ) {
+					$('#error_shortname_alphanumeric').removeClass('hidden');
+				} else {
+					if(data_to_post.name.length <= 256){
+						if(data_to_post.imageheader.length <= 200){
+							if(isURL(data_to_post.imageheader) || data_to_post.imageheader == ""){
+
+								$.post('/api/boards', data_to_post, function(response){
+									console.log('api/boards response: ' + response);
+
+									let receivedObject = JSON.parse(response);
+									if('success' in receivedObject){
+										$('#error_server_message').removeClass('hidden')
+										$('#error_server_message p').text(receivedObject.message);
+										console.log(receivedObject.message);
+									} else {
+										if (receivedObject.boards.length == 0) {
+											$.post('/api/boards/add', data_to_post, function(response){
+												let receivedObject = JSON.parse(response);
+												console.log('/api/boards/add response: ' + response);
+												
+												if('success' in receivedObject){
+													$('#error_server_message').removeClass('hidden')
+													$('#error_server_message p').text(receivedObject.message);
+													console.log(receivedObject.message);
+												} 
+
+											});
+										} else {
+										$('#error_server_message').removeClass('hidden')
+										$('#error_server_message p').text('There already exists a board by that name');
+
+										}
+									}
+								});
+							} else {
+								$('#error_imageheader_url').removeClass('hidden');
+							}
+						} else {
+							$('#error_imageheader_length').removeClass('hidden');
+						}
+					} else {
+						$('#error_name_length').removeClass('hidden');
+					}
+				}
+			} else {
+				$('#error_shortname_length').removeClass('hidden');
+			}
 		});
 	});
 </script>
