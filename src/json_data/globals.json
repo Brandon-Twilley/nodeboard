@@ -9,17 +9,7 @@
 	"request_object": {},
 	"response_object": {},
 	"thread": {
-		"main_post": {
-			"id": "",
-			"title": "",
-			"comment": "",
-			"poster": "",
-			"main_post_images": [],
-			"timestamp": "",
-			"thread_UUID": "",
-			"ip_address": "",
-			"images": []
-		},
+		"main_post": {},
 		"comments": []
 	},
 	"rule": [

@@ -7,8 +7,10 @@ const app = express();
 router.get('/boards/view/', function(request, response, next){
 	var object = {};
 	init.setup_webpage_object(object, request, function(object){
-		object.title = "Boards";
-		response.render('boards/view', object);
+		init.get_boards(object, function(object){
+			object.title = "Boards";
+			response.render('boards/view', object);
+		});
 	});
 })
 

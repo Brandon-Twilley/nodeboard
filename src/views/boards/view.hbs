@@ -22,21 +22,13 @@
 				</tr>
 			</thead>
 			<tbody>
+				{{#each response_object.boards}}
 				<tr>
-					<td>First</td>
-					<td>Cell</td>
-					<td>Cell</td>
+					<td><a href="/boards/view/{{this.shortname}}">{{this.shortname}}</a></td>
+					<td>{{this.board_post_count}}</td>
+					<td>{{this.board_reply_count}}</td>
 				</tr>
-				<tr>
-					<td>Cell</td>
-					<td>Cell</td>
-					<td>Cell</td>
-				</tr>
-				<tr>
-					<td>Cell</td>
-					<td>Cell</td>
-					<td>Cell</td>
-				</tr>
+				{{/each}}
 			</tbody>
 		</table>
 	</div>

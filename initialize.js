@@ -295,3 +295,129 @@ exports.get_boards_shortname = function(webpage_object, callback){
 		return;
 	}
 }
+
+exports.get_boards = function(webpage_object, callback){
+	if(webpage_object.success_message.success == true){
+
+		var con = mysql.createConnection({
+			host: 'localhost',
+			user: 'root',
+			database: 'node_imageboard'
+		})
+		con.connect(function(err){
+			if (err) throw err;
+
+			con.query("SELECT * FROM boards ORDER BY board_post_count LIMIT 15;", function(err, result){
+				if (err) throw err;
+				webpage_object.success_message.success = true;
+				webpage_object.success_message.message = "";
+				webpage_object.response_object = {boards: result};
+				callback(webpage_object);
+				return;
+			
+			});
+		});
+	} else {
+		callback(webpage_object);
+		return;
+	}
+}
+
+exports.get_threads = function(webpage_object, callback){
+	if(webpage_object.success_message.success == true){
+		var query = [];
+
+		var con = mysql.createConnection({
+			host: 'localhost',
+			user: 'root',
+			database: 'node_imageboard'
+		});
+		query.push(webpage_object.request_object.board);
+		con.connect(function(err){
+			if (err) throw err;
+
+			con.query("SELECT * FROM boards WHERE shortname = ?;", query, function(err, result){
+				if (err) throw err;
+
+				if(result.length == 0){
+					webpage_object.success_message.success = false;
+					webpage_object.success_message.message = "There are no boards by that name";
+					callback(webpage_object);
+					return;
+				} else if(result.length == 1){
+					con.query("SELECT * FROM board_" + webpage_object.request_object.board + ";", function(err, result){
+						if (err) throw err;
+
+						webpage_object.response_object.threads = result;
+
+
+						webpage_object.success_message.success = false;
+						webpage_object.success_message.message = "There are no boards by that name";
+
+						callback(webpage_object);
+
+					});
+				} else {
+					webpage_object.success_message.success = false;
+					webpage_object.success_message.message = "Internal server error";
+					callback(webpage_object)
+					return;
+				}
+			
+			});
+		});
+	} else {
+		callback(webpage_object);
+		return;
+	}
+}
+/*
+exports.post_threads = function(webpage_object, callback){
+	if(webpage_object.success_message.success == true){
+		var query = [];
+
+		var con = mysql.createConnection({
+			host: 'localhost',
+			user: 'root',
+			database: 'node_imageboard'
+		});
+		query.push(webpage_object.request_object.board);
+		con.connect(function(err){
+			if (err) throw err;
+
+			con.query("SELECT * FROM boards WHERE shortname = ?;", query, function(err, result){
+				if (err) throw err;
+
+				if(result.length == 0){
+					webpage_object.success_message.success = false;
+					webpage_object.success_message.message = "There are no boards by that name";
+					callback(webpage_object);
+					return;
+				} else if(result.length == 1){
+					con.query("SELECT * FROM board_" + webpage_object.request_object.board + ";", function(err, result){
+						if (err) throw err;
+
+						webpage_object.response_object.threads = result;
+
+
+						webpage_object.success_message.success = false;
+						webpage_object.success_message.message = "There are no boards by that name";
+
+						callback(webpage_object);
+
+					});
+				} else {
+					webpage_object.success_message.success = false;
+					webpage_object.success_message.message = "Internal server error";
+					callback(webpage_object)
+					return;
+				}
+			
+			});
+		});
+	} else {
+		callback(webpage_object);
+		return;
+	}
+
+}*/
