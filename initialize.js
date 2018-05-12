@@ -4,6 +4,7 @@ const mysql = require('mysql');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const app = express();
+const uuidv1 = require('uuid/v1');
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
@@ -350,9 +351,8 @@ exports.get_threads = function(webpage_object, callback){
 
 						webpage_object.response_object.threads = result;
 
-
-						webpage_object.success_message.success = false;
-						webpage_object.success_message.message = "There are no boards by that name";
+						webpage_object.success_message.success = true;
+						webpage_object.success_message.message = "";
 
 						callback(webpage_object);
 
@@ -363,7 +363,6 @@ exports.get_threads = function(webpage_object, callback){
 					callback(webpage_object)
 					return;
 				}
-			
 			});
 		});
 	} else {
@@ -421,3 +420,7 @@ exports.post_threads = function(webpage_object, callback){
 	}
 
 }*/
+
+exports.get_uuid = function(){
+	return uuidv1();
+}

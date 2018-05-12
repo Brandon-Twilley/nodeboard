@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const path = require('path');
 const hbs = require('express-handlebars');
 const raven = require('raven');
+const uuid = require('uuid');
 
 const routes = require('./src/routes/routes');
 const app = express();
