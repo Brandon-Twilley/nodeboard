@@ -6,7 +6,11 @@
 		"success": true,
 		"message": ""
 	},
-	"request_object": {},
+	"request_object": {
+		"board": "",
+		"ip_address": ""
+	},
+	"board": "",
 	"response_object": {},
 	"thread": {
 		"main_post": {},

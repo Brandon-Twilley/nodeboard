@@ -62,7 +62,7 @@ threads table:
 	id					(primary key integer of the post number in the thread)
 	thread_name			(varchar)
 	thread_text			(text)
-	thread_poster		(1 to 1 user_id)
+	poster_ip_addr		(varchar)
 	thread_replies		(1 to many)
 	thread_images		(1 to many)
 	thread_timestamp	timestamp
