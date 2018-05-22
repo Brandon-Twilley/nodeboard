@@ -4,6 +4,7 @@ const mysql = require('mysql');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const app = express();
+const uuidv1 = require('uuid/v1');
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
@@ -139,7 +140,7 @@ exports.get_threads_comments = function(webpage_object, callback){
 		return;
 	}
 }
-/*
+
 exports.get_threads = function(webpage_object, callback){
 	if(webpage_object.success_message.success == true){
 		var con = mysql.createConnection({
@@ -151,12 +152,63 @@ exports.get_threads = function(webpage_object, callback){
 		con.connect(function(err){
 			if (err) throw err;
 			
-			con.query()
+			con.query('SELECT * from board_' + object.board + ';', function(err, result){
+				if (err) throw err;
+
+				webpage_object.response_object = result;
+				console.log(JSON.stringify(webpage_object.response_object));
+				callback(webpage_object);
+
+			});
+
 
 		});
 	}
 
-}*/
+}
+
+exports.post_threads = function(webpage_object, callback){
+	if(webpage_object.success_message.success == true){
+		let query = [];
+		let thread_uuid = get_uuid();
+		query.push(webpage_object.request_object.ip_address);
+		query.push(thread_uuid);
+		query.push(webpage_object.request_object.post);
+		query.push(webpage_object.request_object.title)
+		var con = mysql.createConnection({
+			host: 'localhost',
+			user: 'root',
+			database: 'node_imageboard'
+		});
+
+
+
+		con.connect(function(err){
+			if (err) throw err;
+
+			
+			var statement = con.query('INSERT INTO board_' + webpage_object.board + '(ip_address, thread_UUID, post, title) VALUES ( ? , ? , ? , ? );', query, function(err, result){
+				console.log('sql query: ' + statement.sql);
+				if (err) {
+					webpage_object.success_message.success = false;
+					webpage_object.success_message.message = "General SQL Error";
+					callback(webpage_object);
+					throw err
+				};
+				webpage_object.success_message.success = true;
+				webpage_object.success_message.message = "";
+
+				webpage_object.response_object = result;
+				console.log(JSON.stringify(webpage_object.response_object));
+				callback(webpage_object);
+
+			});
+
+
+		});
+	}
+
+}
 
 exports.create_board = function(webpage_object, callback){
 	if(webpage_object.success_message.success == true){
@@ -235,7 +287,7 @@ exports.create_board = function(webpage_object, callback){
 						});
 						if(webpage_object.success_message.success){
 
-							con.query("create table board_" + query[2] + " (id INT NOT NULL AUTO_INCREMENT , ip_address varchar(20) NOT NULL , comment_UUID varchar(32) NOT NULL , thread_UUID varchar(32) NOT NULL , poster_id INT , replies_UUID varchar(32) NOT NULL , replied_to_UUID varchar(32) NOT NULL , post text, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (id) );",
+							con.query("create table board_" + query[2] + " (id INT NOT NULL AUTO_INCREMENT , ip_address varchar(20) NOT NULL , thread_UUID varchar(40) NOT NULL ,  post text, title text, created DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, updated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (id) );",
 								function(err, result){
 									if (err) {
 										console.log('sql statement: ' + this.sql);
@@ -294,4 +346,134 @@ exports.get_boards_shortname = function(webpage_object, callback){
 		callback(webpage_object);
 		return;
 	}
+}
+
+exports.get_boards = function(webpage_object, callback){
+	if(webpage_object.success_message.success == true){
+
+		var con = mysql.createConnection({
+			host: 'localhost',
+			user: 'root',
+			database: 'node_imageboard'
+		})
+		con.connect(function(err){
+			if (err) throw err;
+
+			con.query("SELECT * FROM boards ORDER BY board_post_count LIMIT 15;", function(err, result){
+				if (err) throw err;
+				webpage_object.success_message.success = true;
+				webpage_object.success_message.message = "";
+				webpage_object.response_object = {boards: result};
+				console.log('webpage_object before callback function: ' + webpage_object.response_object);
+				callback(webpage_object);
+				return;
+			
+			});
+		});
+	} else {
+		console.log('failed to connect to the database');
+		callback(webpage_object);
+		return;
+	}
+}
+
+exports.get_threads = function(webpage_object, callback){
+	if(webpage_object.success_message.success == true){
+		let query = [];
+		var con = mysql.createConnection({
+			host: 'localhost',
+			user: 'root',
+			database: 'node_imageboard'
+		});
+		query.push(webpage_object.board);
+		con.connect(function(err){
+			if (err) throw err;
+
+			let statement = con.query("SELECT * FROM node_imageboard.boards WHERE shortname = ?;", [webpage_object.board], function(err, result){
+				console.log('query: ' + statement.sql);
+				if (err) throw err;
+
+				if(result.length == 0){
+					webpage_object.success_message.success = false;
+					webpage_object.success_message.message = "There are no boards by that name";
+					callback(webpage_object);
+					return;
+				} else if(result.length == 1){
+					con.query("SELECT * FROM board_" + webpage_object.board + ";", function(err, result){
+						if (err) throw err;
+
+						webpage_object.response_object.threads = result;
+
+						webpage_object.success_message.success = true;
+						webpage_object.success_message.message = "";
+
+						callback(webpage_object);
+
+					});
+				} else {
+					webpage_object.success_message.success = false;
+					webpage_object.success_message.message = "Internal server error";
+					callback(webpage_object)
+					return;
+				}
+			});
+		});
+	} else {
+		callback(webpage_object);
+		return;
+	}
+}
+/*
+exports.post_threads = function(webpage_object, callback){
+	if(webpage_object.success_message.success == true){
+		var query = [];
+
+		var con = mysql.createConnection({
+			host: 'localhost',
+			user: 'root',
+			database: 'node_imageboard'
+		});
+		query.push(webpage_object.request_object.board);
+		con.connect(function(err){
+			if (err) throw err;
+
+			con.query("SELECT * FROM boards WHERE shortname = ?;", query, function(err, result){
+				if (err) throw err;
+
+				if(result.length == 0){
+					webpage_object.success_message.success = false;
+					webpage_object.success_message.message = "There are no boards by that name";
+					callback(webpage_object);
+					return;
+				} else if(result.length == 1){
+					con.query("SELECT * FROM board_" + webpage_object.request_object.board + ";", function(err, result){
+						if (err) throw err;
+
+						webpage_object.response_object.threads = result;
+
+
+						webpage_object.success_message.success = false;
+						webpage_object.success_message.message = "There are no boards by that name";
+
+						callback(webpage_object);
+
+					});
+				} else {
+					webpage_object.success_message.success = false;
+					webpage_object.success_message.message = "Internal server error";
+					callback(webpage_object)
+					return;
+				}
+			
+			});
+		});
+	} else {
+		callback(webpage_object);
+		return;
+	}
+
+}*/
+
+get_uuid = function(){
+	return uuidv1();
 }
