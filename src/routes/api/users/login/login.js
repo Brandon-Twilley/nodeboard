@@ -21,10 +21,11 @@ router.post('/api/users/login', function(request, response, next){
 	response_object.message = "";
 
 	var con = mysql.createConnection({
-		host: "localhost",
-		user: "root",
-		database: "node_imageboard",
-	});
+				host: "root",
+				user: "root",
+				password: "root",
+				database: "node_imageboard",
+			});
 	
 	query.push(post_request.username);
 	

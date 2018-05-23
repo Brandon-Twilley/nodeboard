@@ -33,6 +33,7 @@ exports.setup_webpage_object = function(webpage_object, request, callback){
 			var con = mysql.createConnection({
 				host: "localhost",
 				user: "root",
+				password: "root",
 				database: "node_imageboard",
 			});
 			
@@ -90,10 +91,11 @@ exports.get_comments = function(webpage_object, callback){
 		query.push(webpage_object.thread);
 		query.push(webpage_object.board);
 		var con = mysql.createConnection({
-			host: 'localhost',
-			user: 'root',
-			database: 'node_imageboard'
-		});
+				host: "localhost",
+				user: "root",
+				password: "root",
+				database: "node_imageboard",
+			});
 
 
 
@@ -130,10 +132,11 @@ exports.post_comments = function(webpage_object, callback){
 		query.push(webpage_object.request_object.comment);
 		query.push(webpage_object.request_object.title);
 		var con = mysql.createConnection({
-			host: 'localhost',
-			user: 'root',
-			database: 'node_imageboard'
-		});
+				host: "localhost",
+				user: "root",
+				password: "root",
+				database: "node_imageboard",
+			});
 
 
 
@@ -177,10 +180,11 @@ exports.get_threads = function(webpage_object, callback){
 	if(webpage_object.success_message.success == true){
 		let query = [];
 		var con = mysql.createConnection({
-			host: 'localhost',
-			user: 'root',
-			database: 'node_imageboard'
-		});
+				host: "localhost",
+				user: "root",
+				password: "root",
+				database: "node_imageboard",
+			});
 		query.push(webpage_object.board);
 		con.connect(function(err){
 			if (err) throw err;
@@ -229,10 +233,11 @@ exports.post_threads = function(webpage_object, callback){
 		query.push(webpage_object.request_object.post);
 		query.push(webpage_object.request_object.title)
 		var con = mysql.createConnection({
-			host: 'localhost',
-			user: 'root',
-			database: 'node_imageboard'
-		});
+				host: "localhost",
+				user: "root",
+				password: "root",
+				database: "node_imageboard",
+			});
 
 
 
@@ -287,10 +292,11 @@ exports.get_boards = function(webpage_object, callback){
 	if(webpage_object.success_message.success == true){
 
 		var con = mysql.createConnection({
-			host: 'localhost',
-			user: 'root',
-			database: 'node_imageboard'
-		})
+				host: "localhost",
+				user: "root",
+				password: "root",
+				database: "node_imageboard",
+			});
 		con.connect(function(err){
 			if (err) throw err;
 
@@ -319,9 +325,10 @@ exports.create_board = function(webpage_object, callback){
 			let username_query = [];
 
 			var con = mysql.createConnection({
-				host: 'localhost',
-				user: 'root',
-				database: 'node_imageboard'
+				host: "localhost",
+				user: "root",
+				password: "root",
+				database: "node_imageboard",
 			});
 			
 			
@@ -426,10 +433,11 @@ exports.get_boards_shortname = function(webpage_object, callback){
 		query.push(webpage_object.request_object.shortname)
 
 		var con = mysql.createConnection({
-			host: 'localhost',
-			user: 'root',
-			database: 'node_imageboard'
-		})
+				host: "localhost",
+				user: "root",
+				password: "root",
+				database: "node_imageboard",
+			});
 		con.connect(function(err){
 			if (err) throw err;
 
