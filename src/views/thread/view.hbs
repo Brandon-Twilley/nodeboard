@@ -1,84 +1,6 @@
-<!--<div class="divided grid" style=" margin-right: 3em; margin-top: 3em; font-size: 12px; font-weight: normal !important;">
-	<h5 class="ui center red inverted top attached header" style="border-radius: 0px; font-size: 12px; font-family: monospace;"> #: {{this.response_object.thread.main_post.id}} | TIME: {{this.response_object.thread.main_post.timestamp}} | UUID: {{this.response_object.thread.main_post.response_object.thread_UUID}} </h5>
-	<div class="ui center inverted attached segment" style="border-radius: 0px;">
-		<p>
-			<h3>{{response_object.thread.main_post.title}}</h3>
-			{{response_object.thread.main_post.comment}}
-		</p>
-	</div>
-</div>
-<div class="divided grid" style=" margin-left: 3em; margin-top: 3em; font-size: 12px; font-weight: normal !important;">
-	{{#each response_object.thread.comments}}
-	<h5 class="ui center red inverted top attached header" style="border-radius: 0px; font-family: monospace;"> #: {{this.id}} | TIME: {{this.timestamp}} | UUID: {{this.comment_UUID}} </h5>
-	<div class="ui center inverted attached segment" style="border-radius: 0px;">
-		<p>
-			{{this.post}}
-		</p>
-	</div>
-	{{/each}}
-</div>
-<div class="divided grid" style="margin-top: 3em; font-size: 12px; font-weight: normal !important;">
-	<h5 class="ui center red inverted top attached header" style="border-radius: 0px; font-family: monospace;">POST</h5>
-	<div id="post_box" class="ui center inverted attached segment" style="padding: 2em; border-radius: 0px;">
-		<div id="text_input" class="ui inverted form">
-			<textarea class="inverted" style="background: #00000052; color: white; margin-top: 0px; margin-bottom: 0px; height: 112px; border-radius: 0px; font-family: monospace;"></textarea>
-			<div id="submit_add" class="ui inverted right red button" style="text-align: center; border-radius: 0px; margin: 1em; font-family: monospace; margin-left: calc( 50% - 43px );">Submit</div>
-		</div>
-		<div id="loader_div">
-			<div id="loader" class="ui loader"></div>
-		</div>
-	</div>
-</div>
--->
-
-
-
-
-<!--<div id="board-vue">
-
-	<div v-for="thread in threads">
-
-		<div class="divided grid thread-head" style=" margin-right: 3em; margin-top: 3em; font-size: 12px; font-weight: normal !important;">
-			<h5 class="ui center red inverted top attached header" style="border-radius: 0px; font-size: 12px; font-family: monospace;"> #: 2145 | TIME: NOW | UUID: 1234 </h5>
-			<div class="ui center inverted attached segment" style="border-radius: 0px;">
-				<p>
-					<h3 style="font-family: monospace;">${thread.head_title}</h3>
-					${thread.head_post}
-				</p>
-			</div>
-		</div>
-
-		<div class="divided grid" style="margin-top: 3em; font-size: 12px; font-weight: normal !important;" v-for="comment in thread.replies">
-			<h5 class="ui center red inverted top attached header" style="border-radius: 0px; font-family: monospace; margin-left: 3em; margin-right: -44px"> #: 3123 | TIME: NOW | UUID: UUID </h5>
-
-			<div class="ui center inverted attached segment" style="border-radius: 0px; margin-left: 3em">
-				<p>
-					${comment}
-				</p>
-			</div>
-		</div>
-
-		<div class="divided grid" style="margin-top: 3em; font-size: 12px; font-weight: normal !important;">
-			<h5 class="ui center red inverted top attached header" style="border-radius: 0px; font-family: monospace; margin-left: 3em; margin-right: -44px;">POST</h5>
-			<div id="post_box" class="ui center inverted attached segment" style="padding: 2em; border-radius: 0px; margin-left: 3em; margin-right: -44px;">
-				<div id="text_input" class="ui inverted form">
-					<textarea class="inverted" style="background: #00000052; color: white; margin-top: 0px; margin-bottom: 0px; height: 112px; border-radius: 0px; font-family: monospace;" v-model="threads[0].new_reply" @keyup.enter="add_reply"></textarea>
-				</div>
-				<div id="loader_div">
-					<div id="loader" class="ui loader"></div>
-				</div>
-			</div>
-		</div>
-	
-	</div>
-</div>
-
-
-</div>-->
-
 <div id="board-vue">
 
-	<div class="divided grid" style="margin-top: 3em; margin-right: 3em; font-size: 12px; font-weight: normal !important;">
+	<div v-if="!single_thread_mode" class="divided grid" style="margin-top: 3em; margin-right: 3em; font-size: 12px; font-weight: normal !important;">
 		<h5 class="ui center red inverted top attached header" style="border-radius: 0px; font-family: monospace;">NEW THREAD</h5>
 		<div id="post_box" class="ui center inverted attached segment" style="padding: 2em; border-radius: 0px; height: 207px;">
 			<div id="text_input" class="ui inverted form">
@@ -93,19 +15,63 @@
 
 
 	<div v-for="thread in threads">
-
-		<div class="divided grid thread-head" style=" margin-right: 3em; margin-top: 3em; font-size: 12px; font-weight: normal !important;">
-			<h5 class="ui center red inverted top attached header" style="border-radius: 0px; font-size: 12px; font-family: monospace;"> #: 2145 | TIME: NOW | UUID: 1234 </h5>
-			<div class="ui center inverted attached segment" style="border-radius: 0px; padding-bottom: 3em; padding-left: 3em; padding-right: 3em;">
+		<div v-if="thread.visible" v-bind:id="thread.thread_UUID" class="thread_head divided grid thread-head" style=" margin-right: 3em; margin-top: 3em; font-size: 12px; font-weight: normal !important;">
+			<h5 v-on:click="expand_thread(thread.thread_UUID)" class="ui center red inverted top attached header" style="border-radius: 0px; font-size: 12px; font-family: monospace;"> #: ${thread.id} | TIME: ${thread.created} | UUID: ${thread.thread_UUID} </h5>
+			<div v-on:click="expand_thread(thread.thread_UUID)" class="ui center inverted attached segment" style="border-radius: 0px; padding: 1em; text-align: center; border-bottom: 0px;">
 				<p>
-					<h3 style="font-family: monospace;">${thread.head_title}</h3>
-					${thread.head_post}
+					<h3 style="font-family: monospace; margin: 0em;">${thread.title}</h3>
 				</p>
 			</div>
+			<div v-on:click="expand_thread(thread.thread_UUID)" class="ui center inverted attached segment" style="text-align: center; border-radius: 0px; padding: 1em;">
+				<p>
+					${thread.post}
+				</p>
+			</div>
+			<div v-if="false" class="thread_branch ui center inverted attached segment" style="border-radius: 0px; padding: 1em; background-color: transparent; display: inline; border-right: 0px: border-bottom: 0px; padding-bottom: 36em; border-right: 0px; border-bottom: 0px;">
+			</div>
+
+			<div v-if="thread.expanded">
+				<div class="divided grid comment_post" style="margin-top: 3em; font-size: 12px; font-weight: normal !important;" v-for="comment in thread.replies">
+					<h5 class="ui center red inverted top attached header" style="border-radius: 0px; font-family: monospace; margin-left: -1px; margin-right: -38px"> #: ${comment.id} | TIME: ${comment.created} | UUID: ${comment.comment_UUID} </h5>
+
+					<div class="ui center inverted attached segment" style="border-radius: 0px; margin-left: 36px; padding: 1em; border-bottom: 0px;">
+						<p>
+							<h3 style="font-family: monospace; margin: 0em; text-align: center;">${comment.title}</h3>
+						</p>
+					</div>
+					<div v-on:click="expand_thread(thread.thread_UUID)" class="ui center inverted attached segment" style="border-radius: 0px; padding: 1em; margin-left: 36px; margin-right: -38px; text-align: center;">
+						<p>
+							${comment.post}
+						</p>
+					</div>
+				</div>
+			</div>
+
+			<div v-if="single_thread_mode" class="divided grid" style="margin-top: 3em; margin-right: -3em; margin-left: 3em; font-size: 12px; font-weight: normal !important;">
+				<h5 class="ui center red inverted top attached header" style="border-radius: 0px; font-family: monospace;">Post Comment</h5>
+				<div class="ui center inverted attached segment" style="padding: 2em; border-radius: 0px; height: 207px;">
+					<div class="ui inverted form">
+						<input style="border-radius: 0px; color: white; background: #00000052;" v-model="thread.title_holder"placeholder="Comment Title" @keyup.enter="post_comment(thread.thread_UUID)" type="text">
+						<textarea class="inverted" v-model="thread.post_holder" placeholder="Comment Body" @keyup.enter="post_comment(thread.thread_UUID)" style="background: #00000052; color: white; margin-top: 0px; margin-bottom: 0px; height: 112px; border-radius: 0px; font-family: monospace;" ></textarea>
+					</div>
+					<div id="loader_div">
+						<div id="loader" class="ui loader"></div>
+					</div>
+				</div>
+			</div>
 		</div>
-	
 	</div>
 </div>
+<style type="text/css">
+.fadein-enter {
+	opacity: 0 !important;
+}
+
+.fadein-enter-active {
+	transition: all 1s ease !important;
+	opacity: 1 !important;
+}
+</style>
 
 <script>
 
@@ -114,6 +80,7 @@
 		data: {
 			thread_head: '',
 			thread_title: '',
+			single_thread_mode: false,
 			threads: []
 		},
 		delimiters: ['${', '}'],
@@ -128,13 +95,91 @@
 					title: this.thread_title,
 					post: this.thread_head
 				}
-				this.threads.unshift({head_post: this.thread_head, head_title: this.thread_title, new_reply: '', replies: []});
+				this.threads.unshift({post: this.thread_head, title: this.thread_title, new_reply: '', replies: []});
 				$.post('/api/threads/{{this.board}}', thread_to_post, function(response){
 					console.log(response);
 					boardVue._data.thread_head = '';
 					boardVue._data.thread_title = '';
+					var post_result_object = JSON.parse(response);
+					
+					boardVue._data.threads[0].id = post_result_object.id;
+					boardVue._data.threads[0].thread_UUID = post_result_object.thread_UUID;
+					boardVue._data.threads[0].created = post_result_object.created;
+					boardVue._data.threads[0].updated = post_result_object.updated;
+					boardVue._data.threads[0].expanded = false;
+					boardVue._data.threads[0].visible = true;
+					boardVue._data.threads[0].post_holder = '';
+					boardVue._data.threads[0].title_holder = '';
+
 					return false;
 				})
+			},
+			post_comment: function(uuid) {
+				let current_thread = null;
+				for(var i = 0;i<boardVue._data.threads.length;i++){
+					if(boardVue._data.threads[i].thread_UUID == uuid){
+						current_thread = boardVue._data.threads[i];
+					}
+				}
+				let comment_post = {
+					comment: current_thread.post_holder,
+					title: current_thread.title_holder,
+					thread_UUID: uuid
+				}
+
+
+				//current_thread.replies.push(comment_post);
+				$.post('/api/thread/{{this.board}}/', comment_post, function(response){
+					console.log(response);
+					reply_response_object = JSON.parse(response);
+					current_thread.post_holder = '';
+					current_thread.title_holder = '';
+					var post_result_object = JSON.parse(response);
+					
+					current_thread.replies = [];
+					for(var i = 0;i<reply_response_object.length;i++){
+						current_thread.replies.push(reply_response_object[i]);
+					}
+
+					return false;
+				})
+			},
+			expand_thread: function(uuid){
+				if(boardVue._data.single_thread_mode == false){
+					for(var i = 0;i<boardVue._data.threads.length;i++){
+						var thread = boardVue._data.threads[i];
+						if(thread.thread_UUID == uuid){
+							thread.expanded = true;
+							thread.visible = true;
+						} else {
+							thread.expanded = false;
+							thread.visible = false;
+						}
+					}
+					var current_thread = null;
+					console.log('expanding thread...' + uuid);
+					for(var i = 0;i<boardVue._data.threads.length;i++){
+						if(uuid == boardVue._data.threads[i].thread_UUID){
+							current_thread = boardVue._data.threads[i];
+						}
+					}
+					$.get('/api/thread/{{this.board}}/' + uuid, function(response){
+						var response_object = JSON.parse(response);
+						console.log(response);
+						current_thread.replies = [];
+						for(var i = 0;i<response_object.length; i++){
+							current_thread.replies.push(response_object[i]);
+						}
+					});
+					boardVue._data.single_thread_mode = true;
+				} else {
+					for(var i = 0;i<boardVue._data.threads.length;i++){
+						var thread = boardVue._data.threads[i];
+						thread.expanded = false;
+						thread.visible = true;
+					}
+					boardVue._data.single_thread_mode = false;
+				}
 			}
 		},
 		mounted: function() {
@@ -146,10 +191,19 @@
 				for(var i = 0;i<thread_object.threads.length;i++){
 					boardVue._data.threads.push(
 						{
-							head_post: thread_object.threads[i].post, 
-							head_title: thread_object.threads[i].title,
-							new_reply: '',
-							replies: [],
+
+							id: thread_object.threads[i].id,
+							thread_UUID: thread_object.threads[i].thread_UUID,
+							post: thread_object.threads[i].post, 
+							title: thread_object.threads[i].title,
+							created: thread_object.threads[i].created,
+							updated: thread_object.threads[i].updated,
+							expanded: false,
+							visible: true,
+							height_offset: 0,
+							post_holder: '',
+							title_holder: '',
+							replies: []
 						}
 					)
 				}
