@@ -37,12 +37,9 @@ comment table:
 	ip_address			(varchar(20))
 	comment_UUID		(UUID)
 	thread UUID			(UUID)
-	poster_id			(1 to 1 user_id)
-	replies				(1 to 1000 comment_id)
-	replied_to			(1 to many comment_id)
 	post				(text)
+	title				(text)
 	timestamp			(date_timestamp)
-	tag					(string optional identifier)
 
 pools table:
 
