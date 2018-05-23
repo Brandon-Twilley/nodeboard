@@ -33,12 +33,6 @@
 			<div v-if="thread.expanded">
 				<div class="divided grid comment_post" style="margin-top: 3em; font-size: 12px; font-weight: normal !important;" v-for="comment in thread.replies">
 					<h5 class="ui center red inverted top attached header" style="border-radius: 0px; font-family: monospace; margin-left: -1px; margin-right: -38px"> #: ${comment.id} | TIME: ${comment.created} | UUID: ${comment.comment_UUID} </h5>
-
-					<div class="ui center inverted attached segment" style="border-radius: 0px; margin-left: 36px; padding: 1em; border-bottom: 0px;">
-						<p>
-							<h3 style="font-family: monospace; margin: 0em; text-align: center;">${comment.title}</h3>
-						</p>
-					</div>
 					<div v-on:click="expand_thread(thread.thread_UUID)" class="ui center inverted attached segment" style="border-radius: 0px; padding: 1em; margin-left: 36px; margin-right: -38px; text-align: center;">
 						<p>
 							${comment.post}
@@ -51,7 +45,6 @@
 				<h5 class="ui center red inverted top attached header" style="border-radius: 0px; font-family: monospace;">Post Comment</h5>
 				<div class="ui center inverted attached segment" style="padding: 2em; border-radius: 0px; height: 207px;">
 					<div class="ui inverted form">
-						<input style="border-radius: 0px; color: white; background: #00000052;" v-model="thread.title_holder"placeholder="Comment Title" @keyup.enter="post_comment(thread.thread_UUID)" type="text">
 						<textarea class="inverted" v-model="thread.post_holder" placeholder="Comment Body" @keyup.enter="post_comment(thread.thread_UUID)" style="background: #00000052; color: white; margin-top: 0px; margin-bottom: 0px; height: 112px; border-radius: 0px; font-family: monospace;" ></textarea>
 					</div>
 					<div id="loader_div">
@@ -109,7 +102,6 @@
 					boardVue._data.threads[0].expanded = false;
 					boardVue._data.threads[0].visible = true;
 					boardVue._data.threads[0].post_holder = '';
-					boardVue._data.threads[0].title_holder = '';
 
 					return false;
 				})
@@ -123,7 +115,6 @@
 				}
 				let comment_post = {
 					comment: current_thread.post_holder,
-					title: current_thread.title_holder,
 					thread_UUID: uuid
 				}
 
@@ -133,7 +124,6 @@
 					console.log(response);
 					reply_response_object = JSON.parse(response);
 					current_thread.post_holder = '';
-					current_thread.title_holder = '';
 					var post_result_object = JSON.parse(response);
 					
 					current_thread.replies = [];
