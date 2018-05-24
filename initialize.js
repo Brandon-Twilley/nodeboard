@@ -21,10 +21,8 @@ exports.setup_webpage_object = function(webpage_object, request, callback){
 		let query = [];
 		let success_message = {};
 		webpage_object.request_object = request.body;
+		console.log('cookies: ' + JSON.stringify(cookies_request));
 		console.log('request.body: ' + JSON.stringify(webpage_object.request_object));
-		webpage_object.success_message.success = true;
-		webpage_object.success_message.message = "";
-		console.log(JSON.stringify(cookies_request));
 		
 		if(cookies_request.username == ''){
 			callback(webpage_object);
@@ -47,8 +45,7 @@ exports.setup_webpage_object = function(webpage_object, request, callback){
 					
 					if(result.length == 0){
 						webpage_object.success_message.message = "Username not found";
-						webpage_object.success_message.success = false;
-						
+						webpage_object.success_message.success = true;
 						webpage_object.logged_in = false;
 						
 					} else if(result.length == 1) {
@@ -152,6 +149,10 @@ exports.post_comments = function(webpage_object, callback){
 					callback(webpage_object);
 					throw err
 				};
+
+				con.query('UPDATE boards SET board_reply_count = board_reply_count + 1 WHERE shortname=?', [webpage_object.board], function(err, result){
+					console.log('incrementing reply count for thread ' + webpage_object.request_object.thread_UUID + '...');
+				});
 					
 				con.query('SELECT * FROM `' + webpage_object.board + '_' + webpage_object.request_object.thread_UUID + '`;',
 					function(err, result){
@@ -160,7 +161,7 @@ exports.post_comments = function(webpage_object, callback){
 
 						if (err) {
 							webpage_object.success_message.success = false;
-							webpage_object.success_message.message = "Could not retrieve comment that was posted.";
+							webpage_object.success_message.message = "Could not retrieve comments on thread.";
 							callback(webpage_object);
 							throw err
 						}
@@ -244,6 +245,7 @@ exports.post_threads = function(webpage_object, callback){
 		con.connect(function(err){
 			if (err) throw err;
 
+
 			
 			var statement = con.query('INSERT INTO board_' + webpage_object.board + '(ip_address, thread_UUID, post, title) VALUES ( ? , ? , ? , ? );', query, function(err, result){
 				console.log('sql query: ' + statement.sql);
@@ -267,6 +269,10 @@ exports.post_threads = function(webpage_object, callback){
 								console.log("created replies table: " + thread_uuid);
 								webpage_object.success_message.success = true;
 								webpage_object.success_message.message = "Successfully created thread";
+
+								con.query('UPDATE boards SET board_post_count = board_post_count + 1 WHERE shortname=?', [webpage_object.board], function(err, result){
+									console.log('incrementing threads count for board ' + webpage_object.board + '...');
+								});
 
 								con.query("SELECT * FROM board_" + webpage_object.board + " WHERE thread_UUID=?;",[thread_uuid], 
 									function(err, result){
@@ -305,14 +311,14 @@ exports.get_boards = function(webpage_object, callback){
 				webpage_object.success_message.success = true;
 				webpage_object.success_message.message = "";
 				webpage_object.response_object = {boards: result};
-				console.log('webpage_object before callback function: ' + webpage_object.response_object);
+				console.log('webpage_object before callback function: ' + JSON.stringify(webpage_object.response_object));
 				callback(webpage_object);
 				return;
 			
 			});
 		});
 	} else {
-		console.log('failed to connect to the database');
+		console.log(webpage_object.success_message.message);
 		callback(webpage_object);
 		return;
 	}
