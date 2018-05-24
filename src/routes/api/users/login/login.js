@@ -21,7 +21,7 @@ router.post('/api/users/login', function(request, response, next){
 	response_object.message = "";
 
 	var con = mysql.createConnection({
-				host: "root",
+				host: "localhost",
 				user: "root",
 				password: "root",
 				database: "node_imageboard",

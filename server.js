@@ -16,7 +16,7 @@ const bans = require('./src/routes/bans/bans');
 const boards = require('./src/routes/boards/boards');
 const users = require('./src/routes/users/users');
 const rules = require('./src/routes/rules/rules');
-const port = 3000;
+const port = 80;
 
 //Public folder
 raven.config('https://ca5cd013c6f54041afc7db7d2ff5b113@sentry.io/1204185').install();
