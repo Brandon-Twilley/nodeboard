@@ -1,35 +1,43 @@
 <div id="board-vue">
-
-	<div v-if="!single_thread_mode" class="divided grid" style="margin-top: 3em; margin-right: 3em; font-size: 12px; font-weight: normal !important;">
-		<h5 class="ui center red inverted top attached header" style="border-radius: 0px; font-family: monospace;">NEW THREAD</h5>
-		<div id="post_box" class="ui center inverted attached segment" style="padding: 2em; border-radius: 0px; height: 207px;">
-			<div id="text_input" class="ui inverted form">
-				<input id="thread_title" style="border-radius: 0px; color: white; background: #00000052;" @keyup.enter="post_thread" v-model="thread_title" placeholder="Thread Title" type="text">
-				<textarea class="inverted" placeholder="Thread Body" style="background: #00000052; color: white; margin-top: 0px; margin-bottom: 0px; height: 112px; border-radius: 0px; font-family: monospace;" v-model="thread_head" @keyup.enter="post_thread"></textarea>
-			</div>
-			<div id="loader_div">
-				<div id="loader" class="ui loader"></div>
+	<transition mode="out-in">
+		<div v-if="!single_thread_mode" class="divided grid" style="margin-top: 3em; margin-right: 3em; font-size: 12px; font-weight: normal !important;">
+			<h5 class="ui center red inverted top attached header" style="border-radius: 0px; font-family: monospace;">NEW THREAD</h5>
+			<div id="post_box" class="ui center inverted attached segment" style="padding: 2em; border-radius: 0px; height: 207px;">
+				<div id="text_input" class="ui inverted form">
+					<input id="thread_title" style="border-radius: 0px; color: white; background: #00000052;" @keyup.enter="post_thread" v-model="thread_title" placeholder="Thread Title" type="text">
+					<textarea class="inverted" placeholder="Thread Body" style="background: #00000052; color: white; margin-top: 0px; margin-bottom: 0px; height: 112px; border-radius: 0px; font-family: monospace;" v-model="thread_head" @keyup.enter="post_thread"></textarea>
+				</div>
+				<div id="loader_div">
+					<div id="loader" class="ui loader"></div>
+				</div>
 			</div>
 		</div>
-	</div>
-
+	</transition>
 
 	<div v-for="thread in threads">
-		<div v-if="thread.visible" v-bind:id="thread.thread_UUID" class="thread_head divided grid thread-head" style=" margin-right: 3em; margin-top: 3em; font-size: 12px; font-weight: normal !important;">
-			<h5 class="ui center red inverted top attached header" style="border-radius: 0px; font-size: 12px; font-family: monospace;"> #: ${thread.id} | TIME: ${thread.created} | UUID: ${thread.thread_UUID} </h5>
-			<div v-on:click="expand_thread(thread.thread_UUID)" class="ui center inverted attached segment" style="border-radius: 0px; padding: 1em; text-align: center; border-bottom: 0px;">
-				<p>
-					<h3 style="font-family: monospace; margin: 0em;">${thread.title}</h3>
-				</p>
-			</div>
-			<div v-on:click="expand_thread(thread.thread_UUID)" class="ui center inverted attached segment" style="text-align: center; border-radius: 0px; padding: 1em;">
-				<p>
-					${thread.post}
-				</p>
-			</div>
+		<div v-bind:id="thread.thread_UUID" class="thread_head divided grid thread-head" style=" margin-right: 3em; margin-top: 3em; font-size: 12px; font-weight: normal !important;">
+			
+			<transition mode="out-in">
+				<div v-if="thread.visible">
+					<h5 class="ui center red inverted top attached header" style="border-radius: 0px; font-size: 12px; font-family: monospace;"> #: ${thread.id} | TIME: ${thread.created} | UUID: ${thread.thread_UUID} <span v-on:click="expand_thread(thread.thread_UUID)" style="float: right;" v-if="!thread.expanded"><i class="plus icon" style="color: white;"></i>
+		</span><span v-if="thread.expanded" style="float: right;" v-on:click="expand_thread(thread.thread_UUID)"><i class="minus icon" style="color: white;"></i>
+		</span></h5>
+					<div class="ui center inverted attached segment" style="border-radius: 0px; padding: 1em; text-align: center; border-bottom: 0px;">
+						<p>
+							<h3 style="font-family: monospace; margin: 0em;">${thread.title}</h3>
+						</p>
+					</div>
+					<div class="ui center inverted attached segment" style="text-align: center; border-radius: 0px; padding: 1em;">
+						<p>
+							${thread.post}
+						</p>
+					</div>
+				</div>
+			</transition>
+
 			<div v-if="false" class="thread_branch ui center inverted attached segment" style="border-radius: 0px; padding: 1em; background-color: transparent; display: inline; border-right: 0px: border-bottom: 0px; padding-bottom: 36em; border-right: 0px; border-bottom: 0px;">
 			</div>
-
+			<transition mode="out-in">
 			<div v-if="thread.expanded">
 				<div class="divided grid comment_post" style="margin-top: 3em; font-size: 12px; font-weight: normal !important;" v-for="comment in thread.replies">
 					<h5 class="ui center red inverted top attached header" style="border-radius: 0px; font-family: monospace; margin-left: -1px; margin-right: -38px"> #: ${comment.id} | TIME: ${comment.created} | UUID: ${comment.comment_UUID} </h5>
@@ -40,30 +48,50 @@
 					</div>
 				</div>
 			</div>
-
-			<div v-if="single_thread_mode" class="divided grid" style="margin-top: 3em; margin-right: -3em; margin-left: 3em; font-size: 12px; font-weight: normal !important;">
-				<h5 class="ui center red inverted top attached header" style="border-radius: 0px; font-family: monospace;">Post Comment</h5>
-				<div class="ui center inverted attached segment" style="padding: 2em; border-radius: 0px; height: 207px;">
-					<div class="ui inverted form">
-						<textarea class="inverted" v-model="thread.post_holder" placeholder="Comment Body" @keyup.enter="post_comment(thread.thread_UUID)" style="background: #00000052; color: white; margin-top: 0px; margin-bottom: 0px; height: 112px; border-radius: 0px; font-family: monospace;" ></textarea>
-					</div>
-					<div id="loader_div">
-						<div id="loader" class="ui loader"></div>
+			</transition>
+			
+			<transition mode="out-in">
+				<div v-if="thread.visible && single_thread_mode" class="divided grid" style="margin-top: 3em; margin-right: -3em; margin-left: 3em; font-size: 12px; font-weight: normal !important;">
+					<h5 class="ui center red inverted top attached header" style="border-radius: 0px; font-family: monospace;">Post Comment</h5>
+					<div class="ui center inverted attached segment" style="padding: 2em; border-radius: 0px; height: 207px;">
+						<div class="ui inverted form">
+							<textarea class="inverted" v-model="thread.post_holder" placeholder="Comment Body" @keyup.enter="post_comment(thread.thread_UUID)" style="background: #00000052; color: white; margin-top: 0px; margin-bottom: 0px; height: 112px; border-radius: 0px; font-family: monospace;" ></textarea>
+						</div>
+						<div id="loader_div">
+							<div id="loader" class="ui loader"></div>
+						</div>
 					</div>
 				</div>
-			</div>
+			</transition>
 		</div>
 	</div>
 </div>
 <style type="text/css">
-.fadein-enter {
-	opacity: 0 !important;
+
+.v-enter-active {
+	animation: enter .5s;
 }
 
-.fadein-enter-active {
-	transition: all 1s ease !important;
-	opacity: 1 !important;
+.v-leave-active {
+	animation: enter reverse .5s;
 }
+
+.thread-transitions-move {
+	transition: transform .5s;
+}
+
+
+@keyframes enter {
+	0% {
+		transform: translateY(-50px);
+		opacity: 0;
+	}
+	100% {
+		transform: translateY(0px);
+		opacity: 1;
+	}
+}
+
 </style>
 
 <script>
@@ -90,7 +118,6 @@
 				}
 				this.threads.unshift({post: this.thread_head, title: this.thread_title, new_reply: '', replies: []});
 				$.post('/api/threads/{{this.board}}', thread_to_post, function(response){
-					console.log(response);
 					boardVue._data.thread_head = '';
 					boardVue._data.thread_title = '';
 					var post_result_object = JSON.parse(response);
@@ -121,7 +148,6 @@
 
 				//current_thread.replies.push(comment_post);
 				$.post('/api/thread/{{this.board}}/', comment_post, function(response){
-					console.log(response);
 					reply_response_object = JSON.parse(response);
 					current_thread.post_holder = '';
 					var post_result_object = JSON.parse(response);
@@ -147,7 +173,7 @@
 						}
 					}
 					var current_thread = null;
-					console.log('expanding thread...' + uuid);
+
 					for(var i = 0;i<boardVue._data.threads.length;i++){
 						if(uuid == boardVue._data.threads[i].thread_UUID){
 							current_thread = boardVue._data.threads[i];
@@ -155,7 +181,6 @@
 					}
 					$.get('/api/thread/{{this.board}}/' + uuid, function(response){
 						var response_object = JSON.parse(response);
-						console.log(response);
 						current_thread.replies = [];
 						for(var i = 0;i<response_object.length; i++){
 							current_thread.replies.push(response_object[i]);
@@ -173,11 +198,9 @@
 			}
 		},
 		mounted: function() {
-			console.log('running boardVue get_thread');
 			let this_obj = this;
 			$.get('/api/threads/{{this.board}}', function(response){
 				var thread_object = JSON.parse(response);
-				console.log(thread_object);
 				for(var i = 0;i<thread_object.threads.length;i++){
 					boardVue._data.threads.push(
 						{

@@ -76,6 +76,8 @@ exports.setup_webpage_object = function(webpage_object, request, callback){
 					console.log('logged in: ' + webpage_object.logged_in);
 					console.log(JSON.stringify(webpage_object.response_object));
 					callback(webpage_object);
+					con.end();
+					return;
 				});
 			});
 		}
@@ -106,13 +108,16 @@ exports.get_comments = function(webpage_object, callback){
 					webpage_object.success_message.success = false;
 					webpage_object.success_message.message = "General SQL Error";
 					callback(webpage_object);
+					con.end();
 					throw err
 				};
 				webpage_object.success_message.success = true;
 				webpage_object.success_message.message = "";
 				webpage_object.response_object = result;
 					//replies to thread
-				callback(webpage_object)
+				callback(webpage_object);
+				con.end();
+				return;
 			});
 		});
 	}
@@ -147,6 +152,7 @@ exports.post_comments = function(webpage_object, callback){
 					webpage_object.success_message.success = false;
 					webpage_object.success_message.message = "Could not insert comment into thread";
 					callback(webpage_object);
+					con.end();
 					throw err
 				};
 
@@ -163,6 +169,7 @@ exports.post_comments = function(webpage_object, callback){
 							webpage_object.success_message.success = false;
 							webpage_object.success_message.message = "Could not retrieve comments on thread.";
 							callback(webpage_object);
+							con.end();
 							throw err
 						}
 
@@ -171,6 +178,7 @@ exports.post_comments = function(webpage_object, callback){
 						webpage_object.response_object = result;
 
 						callback(webpage_object);
+						con.end();
 					});
 			});
 		});
@@ -198,6 +206,7 @@ exports.get_threads = function(webpage_object, callback){
 					webpage_object.success_message.success = false;
 					webpage_object.success_message.message = "There are no boards by that name";
 					callback(webpage_object);
+					con.end();
 					return;
 				} else if(result.length == 1){
 					con.query("SELECT * FROM board_" + webpage_object.board + ";", function(err, result){
@@ -209,12 +218,14 @@ exports.get_threads = function(webpage_object, callback){
 						webpage_object.success_message.message = "";
 
 						callback(webpage_object);
+						con.end();
 
 					});
 				} else {
 					webpage_object.success_message.success = false;
 					webpage_object.success_message.message = "Internal server error";
-					callback(webpage_object)
+					callback(webpage_object);
+					con.end();
 					return;
 				}
 			});
@@ -253,6 +264,7 @@ exports.post_threads = function(webpage_object, callback){
 					webpage_object.success_message.success = false;
 					webpage_object.success_message.message = "General SQL Error";
 					callback(webpage_object);
+					con.end();
 					throw err
 				};
 				webpage_object.success_message.success = true;
@@ -283,6 +295,7 @@ exports.post_threads = function(webpage_object, callback){
 											webpage_object.response_object = result[0];
 											console.log(JSON.stringify(webpage_object.response_object));
 											callback(webpage_object);
+											con.end();
 											return;
 										}
 									});
@@ -313,6 +326,7 @@ exports.get_boards = function(webpage_object, callback){
 				webpage_object.response_object = {boards: result};
 				console.log('webpage_object before callback function: ' + JSON.stringify(webpage_object.response_object));
 				callback(webpage_object);
+				con.end();
 				return;
 			
 			});
@@ -394,6 +408,7 @@ exports.create_board = function(webpage_object, callback){
 								});
 								throw err;
 								callback(webpage_object);
+								con.end();
 								return;
 							} else {
 								console.log("result: " + JSON.stringify(result));
@@ -412,12 +427,14 @@ exports.create_board = function(webpage_object, callback){
 										webpage_object.success_message.success = true;
 										webpage_object.success_message.message = "Successfully created board";
 										callback(webpage_object);
+										con.end();
 										return;
 									}
 								});
 						}
 					} else {
 						callback(webpage_object);
+						con.end();
 						return;
 					}
 				});
@@ -454,6 +471,7 @@ exports.get_boards_shortname = function(webpage_object, callback){
 				webpage_object.response_object = {boards: result};
 				console.log('ping 1');
 				callback(webpage_object);
+				con.end();
 				return;
 			
 			});
