@@ -162,6 +162,7 @@
 			},
 			expand_thread: function(uuid){
 				if(boardVue._data.single_thread_mode == false){
+					var vue_data = boardVue._data;
 					for(var i = 0;i<boardVue._data.threads.length;i++){
 						var thread = boardVue._data.threads[i];
 						if(thread.thread_UUID == uuid){
