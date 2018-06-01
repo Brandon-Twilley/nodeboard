@@ -1,4 +1,14 @@
-<div id="board-vue">
+	<div class="ui right rail" style="width: calc(20vw + 5em);">
+		<h5 class="ui center red inverted top attached header" style="padding: 2px; border-radius: 0px; font-family: monospace;">DESCRIPTION</h5>
+		<div class="ui center inverted attached segment" style="border-radius: 0px;">
+			<p>
+				{{this.response_object.boards.description}}
+			</p>
+		</div>
+	</div>
+
+
+	<div id="board-vue" >
 
 		<transition>
 			<div v-if="!single_thread_mode" class="divided grid" style="margin-top: 1.5em; margin-right: 3em; font-size: 12px; font-weight: normal !important;">
@@ -54,21 +64,21 @@
 				</div>
 			</div>
 		</transition-group>
-	
-	<transition>
-		<div v-if="post_comment_box" class="divided grid" style="margin-top: 5em; margin-right: -3em; margin-left: 3em; font-size: 12px; font-weight: normal !important; padding: 2px;">
-			<h5 class="ui center red inverted top attached header" style="border-radius: 0px; font-family: monospace;">Post Comment</h5>
-			<div class="ui center inverted attached segment" style="padding: 2em; border-radius: 0px; height: 207px;">
-				<div class="ui inverted form">
-					<textarea class="inverted" v-model="thread_reply" placeholder="Comment Body" @keyup.enter="post_comment(expanded_thread)" style="background: #00000052; color: white; margin-top: 0px; margin-bottom: 0px; height: 112px; border-radius: 0px; font-family: monospace;" ></textarea>
-				</div>
-				<div id="loader_div">
-					<div id="loader" class="ui loader"></div>
+		
+		<transition>
+			<div v-if="post_comment_box" class="divided grid" style="margin-top: 5em; margin-right: -3em; margin-left: 3em; font-size: 12px; font-weight: normal !important; padding: 2px;">
+				<h5 class="ui center red inverted top attached header" style="border-radius: 0px; font-family: monospace;">Post Comment</h5>
+				<div class="ui center inverted attached segment" style="padding: 2em; border-radius: 0px; height: 207px;">
+					<div class="ui inverted form">
+						<textarea class="inverted" v-model="thread_reply" placeholder="Comment Body" @keyup.enter="post_comment(expanded_thread)" style="background: #00000052; color: white; margin-top: 0px; margin-bottom: 0px; height: 112px; border-radius: 0px; font-family: monospace;" ></textarea>
+					</div>
+					<div id="loader_div">
+						<div id="loader" class="ui loader"></div>
+					</div>
 				</div>
 			</div>
-		</div>
-	</transition>
-</div>
+		</transition>
+	</div>
 <style type="text/css">
 
 .v-enter-active {
@@ -244,6 +254,10 @@
 
 		//prevents page refresh when you press enter while cursor is in the input field.
 	$(document).ready(function(){
+		$('#main-container').css('cssText', 'margin-left: unset !important;');
+		$('#main-form').css('margin-left', '10vw');
+		$('#main-form').css('width', '60vw');
+		$('#main-form').css('margin-right', '10%');
 	
 		$(document).keypress(function(e) {
 			if(e.which == 13) {

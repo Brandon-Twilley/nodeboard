@@ -209,7 +209,7 @@ exports.get_threads = function(webpage_object, callback){
 					con.end();
 					return;
 				} else if(result.length == 1){
-					con.query("SELECT * FROM board_" + webpage_object.board + ";", function(err, result){
+					con.query("SELECT * FROM board_" + webpage_object.board + " ORDER BY updated DESC;", function(err, result){
 						if (err) throw err;
 
 						webpage_object.response_object.threads = result;
@@ -451,9 +451,6 @@ exports.create_board = function(webpage_object, callback){
 
 exports.get_boards_shortname = function(webpage_object, callback){
 	if(webpage_object.success_message.success == true){
-		let query = [];
-
-		query.push(webpage_object.request_object.shortname)
 
 		var con = mysql.createConnection({
 				host: "localhost",
@@ -463,12 +460,15 @@ exports.get_boards_shortname = function(webpage_object, callback){
 			});
 		con.connect(function(err){
 			if (err) throw err;
+			let query = [];
+			query.push(webpage_object.board)
 
 			con.query("SELECT * FROM boards WHERE shortname = ?;", query, function(err, result){
 				if (err) throw err;
 				webpage_object.success_message.success = true;
 				webpage_object.success_message.message = "";
-				webpage_object.response_object = {boards: result};
+				webpage_object.response_object = {boards: result[0]};
+				
 				console.log('ping 1');
 				callback(webpage_object);
 				con.end();

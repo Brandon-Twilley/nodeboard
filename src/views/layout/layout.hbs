@@ -39,6 +39,8 @@
 	<link rel="stylesheet" type="text/css" href="/css/semanticui/table.css">
 	<link rel="stylesheet" type="text/css" href="/css/semanticui/list.css">
 	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.1/components/loader.css">
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.1/components/rail.min.css">
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.1/components/sticky.js">
 	<script src="https://cdn.jsdelivr.net/npm/vue" charset="utf-8"></script>
 	
 	<script src="/js/jquery/1.8.3/jquery.min.js"></script>
@@ -84,21 +86,21 @@
 	
 <body style="background-color: black;">
 	<div class="ui middle aligned center aligned grid">
-		<div class="ui container" style="width: 1100px; max-width 80%;">
-		<div class="ui inverted middle aligned center aligned top fixed grid menu" style="font-family: monospace; ">
-			<a href="/" class="item">Home</a>
-			<a href="/rules" class="item">Rules</a>
-			<a href="/boards/view" class="item">Boards</a>
-			{{#if logged_in}}
-			<a class="right item" style="padding: 0em;">
-				<a class="item">{{ username }}</a>
-				<a href="/users/login" class="item">Sign-out</a>
-			</a>
-			{{else}}
-			<a href="/users/login" class="right item">Sign-in</a>
-			{{/if}}
-		</div>
-			<form class="ui inverted middle aligned center aligned large form" style="margin-top: 8em; margin-left: 5em; margin-right: 5em;">
+		<div id="main-container" class="ui container" style="width: 1100px; max-width 80%;">
+			<div class="ui inverted middle aligned center aligned top fixed grid menu" style="font-family: monospace; ">
+				<a href="/" class="item">Home</a>
+				<a href="/rules" class="item">Rules</a>
+				<a href="/boards/view" class="item">Boards</a>
+				{{#if logged_in}}
+				<a class="right item" style="padding: 0em;">
+					<a class="item">{{ username }}</a>
+					<a href="/users/login" class="item">Sign-out</a>
+				</a>
+				{{else}}
+				<a href="/users/login" class="right item">Sign-in</a>
+				{{/if}}
+			</div>
+			<form id="main-form" class="ui inverted middle aligned center aligned large form" style="margin-top: 5em; margin-left: 1em; margin-right: 1em;">
 		{{{ body }}}
 			</form>
 		</div>
