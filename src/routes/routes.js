@@ -3,13 +3,11 @@ const router = express.Router();
 const app = express();
 
 //REST API endpoints
-const api = require('./api/api');
 const bans_api = require('./api/bans/bans');
 const boards_api = require('./api/boards/boards');
 const pools_api = require('./api/boards/pools/pools');
 const pools_comments_api = require('./api/boards/pools/comments/comments');
 const threads_api = require('./api/boards/threads/threads');
-const threads_comments_api = require('./api/boards/threads/comments/comments');
 const users_api = require('./api/users/users');
 const login_api = require('./api/users/login/login');
 
@@ -34,13 +32,11 @@ router.get('/', function(request, response, next){
 });
 
 //api endpoints
-router.use(api);
 router.use(bans_api);
 router.use(boards_api);
 router.use(pools_api);
 router.use(pools_comments_api);
 router.use(threads_api);
-router.use(threads_comments_api);
 router.use(users_api);
 router.use(login_api);
 

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const init = require('../../../../initialize');
+const init = require('../../../../mysql_queries');
 const app = express();
 
 router.get('/boards/threads', function(request, response, next){

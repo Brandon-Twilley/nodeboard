@@ -2,7 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const router = express.Router();
 const cookieParser = require('cookie-parser');
-const init = require('../../../initialize');
+const init = require('../../../mysql_queries');
 
 
 

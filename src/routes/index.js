@@ -1,5 +1,5 @@
 const express = require('express');
-const init = require('../../initialize');
+const init = require('../../mysql_queries');
 const router = express.Router();
 
 router.get('/', function(request, response) {

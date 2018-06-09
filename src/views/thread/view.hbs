@@ -27,7 +27,7 @@
 
 		<div v-for="thread in threads"  :key="thread.thread_UUID">
 			<div v-bind:id="thread.thread_UUID" class="thread_head divided grid thread-head" style=" margin-right: 3em; margin-top: 1.5em; font-size: 12px; font-weight: normal !important;">
-					
+
 
 				<transition>
 					<div v-if="thread.visible">
@@ -64,13 +64,21 @@
 				</div>
 			</div>
 		</transition-group>
-		
+
 		<transition>
 			<div v-if="post_comment_box" class="divided grid" style="margin-top: 5em; margin-right: -3em; margin-left: 3em; font-size: 12px; font-weight: normal !important; padding: 2px;">
 				<h5 class="ui center red inverted top attached header" style="border-radius: 0px; font-family: monospace;">Post Comment</h5>
 				<div class="ui center inverted attached segment" style="padding: 2em; border-radius: 0px; height: 207px;">
 					<div class="ui inverted form">
 						<textarea class="inverted" v-model="thread_reply" placeholder="Comment Body" @keyup.enter="post_comment(expanded_thread)" style="background: #00000052; color: white; margin-top: 0px; margin-bottom: 0px; height: 112px; border-radius: 0px; font-family: monospace;" ></textarea>
+						<!-- <input type="file" (change)="fileEvent($event)" class="inputfile" id="embedpollfileinput" /> -->
+						<div class="ui middle aligned center aligned grid container" style="margin-top: -3em;">
+							<input type="file" class="inputfile" id="imageupload" style="visibility: hidden;" />
+							<label id="fileupload" for="imageupload" class="ui inverted button" style=" font-family:  monospace; border-radius: 0px;">
+								<i class="ui upload icon"></i>
+								Upload image
+							</label>
+						</div>
 					</div>
 					<div id="loader_div">
 						<div id="loader" class="ui loader"></div>
@@ -80,6 +88,10 @@
 		</transition>
 	</div>
 <style type="text/css">
+
+#fileupload:hover {
+    color: black;
+}
 
 .v-enter-active {
 	animation: enter .5s;
@@ -108,6 +120,34 @@
 </style>
 
 <script>
+
+	let uploadImage = function(file, filelist){
+		let formData = new FormData();
+		let xhr = new XMLHttpRequest();
+
+		let onProgress = function(e){
+			if(e.lengthComputable){
+				var percentComplete = (e.loaded/e.total)*100;
+			}
+		};
+
+		let onReady = function(e) {
+		 // ready state
+		};
+
+		let onError = function(err) {
+		  // something went wrong with upload
+		};
+
+		formData.append('files', file);
+		console.log('file name: ', file.name);
+		xhr.open('post', '/api/boards/upload', true);
+		xhr.addEventListener('error', onError, false);
+		xhr.addEventListener('progress', onProgress, false);
+		xhr.send(formData);
+		xhr.addEventListener('readystatechange', onReady, false);
+		filelist = [];
+	}
 
 	let boardVue = new Vue({
 		el: '#board-vue',
@@ -138,7 +178,7 @@
 					boardVue._data.thread_head = '';
 					boardVue._data.thread_title = '';
 					var post_result_object = JSON.parse(response);
-					
+
 					boardVue._data.threads[0].id = post_result_object.id;
 					boardVue._data.threads[0].thread_UUID = post_result_object.thread_UUID;
 					boardVue._data.threads[0].created = post_result_object.created;
@@ -152,7 +192,7 @@
 			},
 			post_comment: function(uuid) {
 				let current_thread = null;
-				
+
 				let comment_post = {
 					comment: boardVue._data.thread_reply,
 					thread_UUID: uuid
@@ -162,12 +202,20 @@
 				$.post('/api/thread/{{this.board}}/', comment_post, function(response){
 					reply_response_object = JSON.parse(response);
 					var post_result_object = JSON.parse(response);
-					
+					let images = document.getElementById('imageupload');
+					let file = document.getElementById('fileupload');
+
 					boardVue._data.replies = [];
 					for(var i = 0;i<reply_response_object.length;i++){
 						boardVue._data.replies.push(reply_response_object[i]);
 					}
 					boardVue._data.thread_reply = '';
+
+						//upload image to /upload route
+					images.files[0].name = boardVue._data.replies[boardVue._data.replies.length-1].comment_UUID + '.' + images.files[0].name.split('.').pop();
+					file.innerHTML = images.files[0].name;
+					uploadImage(images.files[0], images.files);
+
 
 					return false;
 				})
@@ -236,7 +284,7 @@
 
 							id: thread_object.threads[i].id,
 							thread_UUID: thread_object.threads[i].thread_UUID,
-							post: thread_object.threads[i].post, 
+							post: thread_object.threads[i].post,
 							title: thread_object.threads[i].title,
 							created: thread_object.threads[i].created,
 							updated: thread_object.threads[i].updated,
@@ -258,7 +306,7 @@
 		$('#main-form').css('margin-left', '10vw');
 		$('#main-form').css('width', '60vw');
 		$('#main-form').css('margin-right', '10%');
-	
+
 		$(document).keypress(function(e) {
 			if(e.which == 13) {
 				e.preventDefault();

@@ -11,15 +11,15 @@ const routes = require('./src/routes/routes');
 const app = express();
 
 const index = require('./src/routes/index');
-const api = require('./src/routes/api/api');
 const bans = require('./src/routes/bans/bans');
 const boards = require('./src/routes/boards/boards');
 const users = require('./src/routes/users/users');
 const rules = require('./src/routes/rules/rules');
+const credentials = require('./credentials')
 const port = 8080;
 
 //Public folder
-raven.config('https://ca5cd013c6f54041afc7db7d2ff5b113@sentry.io/1204185').install();
+raven.config(credentials.sentryURL).install();
 app.use(raven.requestHandler());
 app.use(raven.errorHandler());
 
