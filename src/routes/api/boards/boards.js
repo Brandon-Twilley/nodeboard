@@ -42,35 +42,31 @@ router.post('/api/boards/add', function(request, response, next){
 	});
 });
 
+router.get('/api/boards/upload', function(request, response, next){
+	// create an incoming form object
+     response.send('this is where you post your images');
+
+});
+
 router.post('/api/boards/upload', function(request, response, next){
 	// create an incoming form object
      var form = new formidable.IncomingForm();
+	console.log('posting to /api/boards/upload route');
+	form.parse(request, function(err, fields, file){
+		form.multiples = false;
 
-     // specify that we want to allow the user to upload multiple files in a single request
-     form.multiples = false;
+	     // store all uploads in the /uploads directory
+	     form.uploadDir = path.join(__dirname, '/image_store');
 
-     // store all uploads in the /uploads directory
-     form.uploadDir = path.join(__dirname, '/uploads');
+	     // every time a file has been uploaded successfully,
+	     // rename it to it's orignal name
+	     response.send('received file: ' + file.name);
+		console.log('file: ' + file.name);
+		console.log('fields: ' + JSON.stringify(fields));
+	});
 
-     // every time a file has been uploaded successfully,
-     // rename it to it's orignal name
-     form.on('file', function(field, file) {
-       fs.rename(file.path, path.join(form.uploadDir, file.name));
-     });
-
-     // log any errors that occur
-     form.on('error', function(err) {
-       console.log('An error has occured: \n' + err);
-     });
-
-     // once all the files have been uploaded, send a response to the client
-     form.on('end', function() {
-       res.end('success');
-     });
 
      // parse the incoming request containing the form data
-     form.parse(req);
-
 });
 /*
 router.post('/api/boards/upload', function(req, res){

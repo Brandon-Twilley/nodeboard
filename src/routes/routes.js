@@ -8,7 +8,6 @@ const boards_api = require('./api/boards/boards');
 const pools_api = require('./api/boards/pools/pools');
 const pools_comments_api = require('./api/boards/pools/comments/comments');
 const threads_api = require('./api/boards/threads/threads');
-const users_api = require('./api/users/users');
 const login_api = require('./api/users/login/login');
 
 //webpage endpoints
@@ -37,7 +36,6 @@ router.use(boards_api);
 router.use(pools_api);
 router.use(pools_comments_api);
 router.use(threads_api);
-router.use(users_api);
 router.use(login_api);
 
 //webpage endpoints

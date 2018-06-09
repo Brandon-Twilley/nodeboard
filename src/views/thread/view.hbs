@@ -136,7 +136,8 @@
 		};
 
 		let onError = function(err) {
-		  // something went wrong with upload
+			// something went wrong with upload
+			console.log('error: ' + err);
 		};
 
 		formData.append('files', file);

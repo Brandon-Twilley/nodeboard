@@ -9,6 +9,7 @@ const uuidv1 = require('uuid/v1');
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
+var DEBUG_FLAG = false;
 
 
 exports.setup_webpage_object = function(webpage_object, request, callback){
@@ -22,8 +23,10 @@ exports.setup_webpage_object = function(webpage_object, request, callback){
 		let query = [];
 		let success_message = {};
 		webpage_object.request_object = request.body;
-		console.log('cookies: ' + JSON.stringify(cookies_request));
-		console.log('request.body: ' + JSON.stringify(webpage_object.request_object));
+		if(DEBUG_FLAG){
+			console.log('cookies: ' + JSON.stringify(cookies_request));
+			console.log('request.body: ' + JSON.stringify(webpage_object.request_object));
+		}
 
 		if(cookies_request.username == ''){
 			callback(webpage_object);
@@ -68,9 +71,10 @@ exports.setup_webpage_object = function(webpage_object, request, callback){
 
 						}
 					}
-
-					console.log('logged in: ' + webpage_object.logged_in);
-					console.log(JSON.stringify(webpage_object.response_object));
+					if(DEBUG_FLAG){
+						console.log('logged in: ' + webpage_object.logged_in);
+						console.log(JSON.stringify(webpage_object.response_object));
+					}
 					callback(webpage_object);
 					con.end();
 					return;
@@ -93,8 +97,10 @@ exports.get_comments = function(webpage_object, callback){
 			if (err) throw err;
 
 			var statement = con.query('SELECT * FROM `' + query[1] + '_' + query[0] + '`;', function(err, result){
-				console.log('sql query: ' + statement.sql);
-				console.log('result: ' + JSON.stringify(result));
+				if (DEBUG_FLAG){
+					console.log('sql query: ' + statement.sql);
+					console.log('result: ' + JSON.stringify(result));
+				}
 				if (err) {
 					webpage_object.success_message.success = false;
 					webpage_object.success_message.message = "General SQL Error";
@@ -118,7 +124,9 @@ exports.post_comments = function(webpage_object, callback){
 	if(webpage_object.success_message.success == true){
 		let query = [];
 		let comment_UUID = get_uuid();
-		console.log('request object: ' + JSON.stringify(webpage_object.request_object))
+		if(DEBUG_FLAG){
+			console.log('request object: ' + JSON.stringify(webpage_object.request_object))
+		}
 		query.push(webpage_object.ip_address);
 		query.push(webpage_object.request_object.thread_UUID);
 		query.push(comment_UUID);
@@ -132,8 +140,10 @@ exports.post_comments = function(webpage_object, callback){
 			if (err) throw err;
 
 			var statement = con.query('INSERT INTO `' + webpage_object.board + '_' + webpage_object.request_object.thread_UUID + '` (ip_address, thread_UUID, comment_UUID, post, title) VALUES ( ? , ? , ? , ? , ? );', query, function(err, result){
-				console.log('sql query: ' + statement.sql);
-				console.log('result: ' + JSON.stringify(result));
+				if(DEBUG_FLAG){
+					console.log('sql query: ' + statement.sql);
+					console.log('result: ' + JSON.stringify(result));
+				}
 				if (err) {
 					webpage_object.success_message.success = false;
 					webpage_object.success_message.message = "Could not insert comment into thread";
@@ -143,14 +153,17 @@ exports.post_comments = function(webpage_object, callback){
 				};
 
 				con.query('UPDATE boards SET board_reply_count = board_reply_count + 1 WHERE shortname=?', [webpage_object.board], function(err, result){
-					console.log('incrementing reply count for thread ' + webpage_object.request_object.thread_UUID + '...');
+					if(DEBUG_FLAG){
+						console.log('incrementing reply count for thread ' + webpage_object.request_object.thread_UUID + '...');
+					}
 				});
 
 				con.query('SELECT * FROM `' + webpage_object.board + '_' + webpage_object.request_object.thread_UUID + '`;',
 					function(err, result){
-						console.log('sql query: ' + statement.sql);
-						console.log('comment inserted: ' + JSON.stringify(result));
-
+						if(DEBUG_FLAG){
+							console.log('sql query: ' + statement.sql);
+							console.log('comment inserted: ' + JSON.stringify(result));
+						}
 						if (err) {
 							webpage_object.success_message.success = false;
 							webpage_object.success_message.message = "Could not retrieve comments on thread.";
@@ -180,7 +193,9 @@ exports.get_threads = function(webpage_object, callback){
 			if (err) throw err;
 
 			let statement = con.query("SELECT * FROM boards WHERE shortname = ?;", [webpage_object.board], function(err, result){
-				console.log('query: ' + statement.sql);
+				if(DEBUG_FLAG){
+					console.log('query: ' + statement.sql);
+				}
 				if (err) throw err;
 
 				if(result.length == 0){
@@ -235,7 +250,9 @@ exports.post_threads = function(webpage_object, callback){
 
 
 			var statement = con.query('INSERT INTO board_' + webpage_object.board + '(ip_address, thread_UUID, post, title) VALUES ( ? , ? , ? , ? );', query, function(err, result){
-				console.log('sql query: ' + statement.sql);
+				if(DEBUG_FLAG){
+					console.log('sql query: ' + statement.sql);
+				}
 				if (err) {
 					webpage_object.success_message.success = false;
 					webpage_object.success_message.message = "General SQL Error";
@@ -250,26 +267,36 @@ exports.post_threads = function(webpage_object, callback){
 				if(webpage_object.success_message.success){
 					con.query("CREATE TABLE `" + webpage_object.board + "_" + thread_uuid + "` (id INT NOT NULL AUTO_INCREMENT , ip_address varchar(20) NOT NULL , thread_UUID varchar(40) NOT NULL ,  comment_UUID varchar(40) NOT NULL, post text, title text, created DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (id) );",
 						function(err, result){
-							console.log('sql statement: ' + this.sql);
+							if(DEBUG_FLAG){
+								console.log('sql statement: ' + this.sql);
+							}
 							if (err) {
 								throw err;
 							} else {
-								console.log("created replies table: " + thread_uuid);
+								if(DEBUG_FLAG){
+									console.log("created replies table: " + thread_uuid);
+								}
 								webpage_object.success_message.success = true;
 								webpage_object.success_message.message = "Successfully created thread";
 
 								con.query('UPDATE boards SET board_post_count = board_post_count + 1 WHERE shortname=?', [webpage_object.board], function(err, result){
-									console.log('incrementing threads count for board ' + webpage_object.board + '...');
+									if(DEBUG_FLAG){
+										console.log('incrementing threads count for board ' + webpage_object.board + '...');
+									}
 								});
 
 								con.query("SELECT * FROM board_" + webpage_object.board + " WHERE thread_UUID=?;",[thread_uuid],
 									function(err, result){
-										console.log('sql statement: ' + this.sql);
+										if(DEBUG_FLAG){
+											console.log('sql statement: ' + this.sql);
+										}
 										if(err){
 											throw err;
 										} else {
 											webpage_object.response_object = result[0];
-											console.log(JSON.stringify(webpage_object.response_object));
+											if(DEBUG_FLAG){
+												console.log(JSON.stringify(webpage_object.response_object));
+											}
 											callback(webpage_object);
 											con.end();
 											return;
@@ -295,7 +322,9 @@ exports.get_boards = function(webpage_object, callback){
 				webpage_object.success_message.success = true;
 				webpage_object.success_message.message = "";
 				webpage_object.response_object = {boards: result};
-				console.log('webpage_object before callback function: ' + JSON.stringify(webpage_object.response_object));
+				if(DEBUG_FLAG){
+					console.log('webpage_object before callback function: ' + JSON.stringify(webpage_object.response_object));
+				}
 				callback(webpage_object);
 				con.end();
 				return;
@@ -303,7 +332,9 @@ exports.get_boards = function(webpage_object, callback){
 			});
 		});
 	} else {
-		console.log(webpage_object.success_message.message);
+		if(DEBUG_FLAG){
+			console.log(webpage_object.success_message.message);
+		}
 		callback(webpage_object);
 		return;
 	}
@@ -329,7 +360,9 @@ exports.create_board = function(webpage_object, callback){
 
 					//get the username id index of the user creating this board.
 				con.query("SELECT * FROM users WHERE username = ?;", [webpage_object.username], function(err, result){
-					console.log('user: ' + JSON.stringify(result[0]));
+					if(DEBUG_FLAG){
+						console.log('user: ' + JSON.stringify(result[0]));
+					}
 					if (err) throw err;
 
 					if(result.length != 1){
@@ -353,7 +386,9 @@ exports.create_board = function(webpage_object, callback){
 
 							//create an entry in the database that manages the boards
 						con.query("INSERT INTO boards (name,imageheader,shortname,description,creator,board_post_count,board_reply_count,tablename) VALUES ( ? , ? , ? , ? , ? , ? , ? , ? );", query, function(err, result){
-							console.log('sql query: ' + this.sql);
+							if(DEBUG_FLAG){
+								console.log('sql query: ' + this.sql);
+							}
 							if  (err) {
 								con.query("SELECT * FROM boards WHERE shortname = ?", [query[2]], function(result, err){
 									if(result.length > 0){
@@ -377,7 +412,9 @@ exports.create_board = function(webpage_object, callback){
 								con.end();
 								return;
 							} else {
-								console.log("result: " + JSON.stringify(result));
+								if(DEBUG_FLAG){
+									console.log("result: " + JSON.stringify(result));
+								}
 								return;
 							}
 						});
@@ -389,7 +426,9 @@ exports.create_board = function(webpage_object, callback){
 										console.log('sql statement: ' + this.sql);
 										throw err;
 									} else {
-										console.log("created board: " + query[0]);
+										if(DEBUG_FLAG){
+											console.log("created board: " + query[0]);
+										}
 										webpage_object.success_message.success = true;
 										webpage_object.success_message.message = "Successfully created board";
 										callback(webpage_object);
@@ -430,7 +469,6 @@ exports.get_boards_shortname = function(webpage_object, callback){
 				webpage_object.success_message.message = "";
 				webpage_object.response_object = {boards: result[0]};
 
-				console.log('ping 1');
 				callback(webpage_object);
 				con.end();
 				return;
