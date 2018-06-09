@@ -5,7 +5,7 @@ const pools = require('./pools/pools');
 const init = require('../../../../mysql_queries');
 const threads = require('./threads/threads');
 const bodyParser = require('body-parser');
-const fs = require('fs');
+const util = require('util');
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
@@ -42,53 +42,12 @@ router.post('/api/boards/add', function(request, response, next){
 	});
 });
 
-router.get('/api/boards/upload', function(request, response, next){
-	// create an incoming form object
-     response.send('this is where you post your images');
-
-});
-
 router.post('/api/boards/upload', function(request, response, next){
 	// create an incoming form object
-     var form = new formidable.IncomingForm();
-	console.log('posting to /api/boards/upload route');
-	form.parse(request, function(err, fields, file){
-		form.multiples = false;
+	console.log('file info: ',req.files.image);
 
-	     // store all uploads in the /uploads directory
-	     form.uploadDir = path.join(__dirname, '/image_store');
-
-	     // every time a file has been uploaded successfully,
-	     // rename it to it's orignal name
-	     response.send('received file: ' + file.name);
-		console.log('file: ' + file.name);
-		console.log('fields: ' + JSON.stringify(fields));
-	});
-
-
-     // parse the incoming request containing the form data
+	
 });
-/*
-router.post('/api/boards/upload', function(req, res){
-     let form = new formidable.IncomingForm();
-     form.uploadDir = __dirname + '/image_store';
-     form.encoding = 'binary';
-
-     form.addListener('file', function(name, file){
-          //do something once the file is uploaded
-     });
-
-     form.addListener('end', function(){
-          res.end();
-     });
-
-     form.parse(req, function(err, fields, files){
-          if(err){
-               console.log(err);
-          }
-     })
-     res.send('ping pong');
-});*/
 
 
 

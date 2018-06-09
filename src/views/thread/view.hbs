@@ -73,11 +73,13 @@
 						<textarea class="inverted" v-model="thread_reply" placeholder="Comment Body" @keyup.enter="post_comment(expanded_thread)" style="background: #00000052; color: white; margin-top: 0px; margin-bottom: 0px; height: 112px; border-radius: 0px; font-family: monospace;" ></textarea>
 						<!-- <input type="file" (change)="fileEvent($event)" class="inputfile" id="embedpollfileinput" /> -->
 						<div class="ui middle aligned center aligned grid container" style="margin-top: -3em;">
-							<input type="file" class="inputfile" id="imageupload" style="visibility: hidden;" />
-							<label id="fileupload" for="imageupload" class="ui inverted button" style=" font-family:  monospace; border-radius: 0px;">
-								<i class="ui upload icon"></i>
-								Upload image
-							</label>
+							<form method="post" enctype="multipart/form-data" action="/upload">
+								<input type="file" class="inputfile" name="imageupload" id="imageupload" style="visibility: hidden;" />
+								<label id="fileupload" for="imageupload" class="ui inverted button" style=" font-family:  monospace; border-radius: 0px;">
+									<i class="ui upload icon"></i>
+									Upload image
+								</label>
+							</form>
 						</div>
 					</div>
 					<div id="loader_div">
@@ -122,32 +124,24 @@
 <script>
 
 	let uploadImage = function(file, filelist){
-		let formData = new FormData();
-		let xhr = new XMLHttpRequest();
+		var result;
+		var fileData = document.getElementById("imageupload").files[0];
+		var xhr = new XMLHttpRequest();
+		var serviceURL = "/api/boards/upload";
 
-		let onProgress = function(e){
-			if(e.lengthComputable){
-				var percentComplete = (e.loaded/e.total)*100;
+		xhr.onreadystatechange = function (Evt) {
+			if (xhr.readyState == 4 && xhr.status == 200) {
+			    Data = JSON.parse(xhr.responseText);
+			    result = Data.IsSuccess;
+			    if (result == true) {
+				   alert('Image uploaded successfully');
+			    }
 			}
-		};
+		}
 
-		let onReady = function(e) {
-		 // ready state
-		};
+		xhr.open('POST', serviceURL, true);
 
-		let onError = function(err) {
-			// something went wrong with upload
-			console.log('error: ' + err);
-		};
-
-		formData.append('files', file);
-		console.log('file name: ', file.name);
-		xhr.open('post', '/api/boards/upload', true);
-		xhr.addEventListener('error', onError, false);
-		xhr.addEventListener('progress', onProgress, false);
-		xhr.send(formData);
-		xhr.addEventListener('readystatechange', onReady, false);
-		filelist = [];
+		xhr.send(fileData);
 	}
 
 	let boardVue = new Vue({
@@ -213,9 +207,10 @@
 					boardVue._data.thread_reply = '';
 
 						//upload image to /upload route
-					images.files[0].name = boardVue._data.replies[boardVue._data.replies.length-1].comment_UUID + '.' + images.files[0].name.split('.').pop();
+					images.files[0].name = reply_response_object[reply_response_object.length-1].comment_UUID + '.' + images.files[0].name.split('.').pop();
 					file.innerHTML = images.files[0].name;
-					uploadImage(images.files[0], images.files);
+					console.log('filename: ' + images.files[0].name)
+					uploadImage();
 
 
 					return false;
