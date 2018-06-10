@@ -265,7 +265,7 @@ exports.post_threads = function(webpage_object, callback){
 
 					//replies to thread
 				if(webpage_object.success_message.success){
-					con.query("CREATE TABLE `" + webpage_object.board + "_" + thread_uuid + "` (id INT NOT NULL AUTO_INCREMENT , ip_address varchar(20) NOT NULL , thread_UUID varchar(40) NOT NULL ,  comment_UUID varchar(40) NOT NULL, post text, title text, created DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (id) );",
+					con.query("CREATE TABLE `" + webpage_object.board + "_" + thread_uuid + "` (id INT NOT NULL AUTO_INCREMENT , ip_address varchar(20) NOT NULL , thread_UUID varchar(40) NOT NULL ,  comment_UUID varchar(40) NOT NULL, post text, image_url text, title text, created DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (id) );",
 						function(err, result){
 							if(DEBUG_FLAG){
 								console.log('sql statement: ' + this.sql);
@@ -479,6 +479,28 @@ exports.get_boards_shortname = function(webpage_object, callback){
 		callback(webpage_object);
 		return;
 	}
+}
+
+exports.set_image_url = function(image_url, board, thread, comment){
+	let query = [];
+	query.push(image_url);
+	query.push(comment);
+	var con = mysql.createConnection(credentials.mySQL_Information);
+	con.connect(function(err){
+		if (err) throw err;
+
+
+		var statement = con.query('UPDATE `' + board + '_' + thread + '` SET image_url=? WHERE comment_UUID=?;', query, function(err, result){
+			console.log('sql query: ' + statement.sql);
+			if(DEBUG_FLAG){
+				console.log('result: ' + JSON.stringify(result));
+			}
+			if (err) {
+				throw err
+			};
+			con.end();
+		});
+	});
 }
 
 get_uuid = function(){

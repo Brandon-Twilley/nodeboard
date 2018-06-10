@@ -68,18 +68,28 @@
 		<transition>
 			<div v-if="post_comment_box" class="divided grid" style="margin-top: 5em; margin-right: -3em; margin-left: 3em; font-size: 12px; font-weight: normal !important; padding: 2px;">
 				<h5 class="ui center red inverted top attached header" style="border-radius: 0px; font-family: monospace;">Post Comment</h5>
-				<div class="ui center inverted attached segment" style="padding: 2em; border-radius: 0px; height: 207px;">
+				<div class="ui center inverted attached segment" style="padding: 2em; padding-bottom: 0em; border-radius: 0px;">
 					<div class="ui inverted form">
-						<textarea class="inverted" v-model="thread_reply" placeholder="Comment Body" @keyup.enter="post_comment(expanded_thread)" style="background: #00000052; color: white; margin-top: 0px; margin-bottom: 0px; height: 112px; border-radius: 0px; font-family: monospace;" ></textarea>
+						<textarea class="inverted" v-model="thread_reply" placeholder="Comment Body" @keyup.enter="post_comment(expanded_thread)" style="background: #00000052; color: white; margin-top: 0px; margin-bottom: 0px; border-radius: 0px; font-family: monospace;" ></textarea>
 						<!-- <input type="file" (change)="fileEvent($event)" class="inputfile" id="embedpollfileinput" /> -->
-						<div class="ui middle aligned center aligned grid container" style="margin-top: -3em;">
-							<form method="post" enctype="multipart/form-data" action="/upload">
-								<input type="file" class="inputfile" name="imageupload" id="imageupload" style="visibility: hidden;" />
-								<label id="fileupload" for="imageupload" class="ui inverted button" style=" font-family:  monospace; border-radius: 0px;">
-									<i class="ui upload icon"></i>
-									Upload image
-								</label>
-							</form>
+						<div class="ui middle aligned center aligned grid container" style="margin: 1em;">
+
+								<form method="post" enctype="multipart/form-data">
+									<input type="file" style="display: none; width: 0px; height: 0px;" class="input-xlarge" id="thumbnail" name="thumbnail">
+									<input type="button" style="display: none; width: 0px;height: 0px;" class="btn btn-primary" id="upload" name="upload" value="Upload">
+
+									<label id="imageupload" for="thumbnail" class="ui inverted button" style=" font-family:  monospace; border-radius: 0px; height: 36px;">
+										<i class="ui upload icon"></i>
+										Upload image
+									</label>
+									<canvas id="thumbn"></canvas><br> <!-- thumbnail image (100px image) -->
+
+									<canvas id="image-to-server" style="display: none;"></canvas><br>
+									<img src="" style="display: none;" id="img1" /><br> <!-- image holder -->
+
+								</form>
+
+
 						</div>
 					</div>
 					<div id="loader_div">
@@ -89,6 +99,8 @@
 			</div>
 		</transition>
 	</div>
+
+
 <style type="text/css">
 
 #fileupload:hover {
@@ -122,27 +134,6 @@
 </style>
 
 <script>
-
-	let uploadImage = function(file, filelist){
-		var result;
-		var fileData = document.getElementById("imageupload").files[0];
-		var xhr = new XMLHttpRequest();
-		var serviceURL = "/api/boards/upload";
-
-		xhr.onreadystatechange = function (Evt) {
-			if (xhr.readyState == 4 && xhr.status == 200) {
-			    Data = JSON.parse(xhr.responseText);
-			    result = Data.IsSuccess;
-			    if (result == true) {
-				   alert('Image uploaded successfully');
-			    }
-			}
-		}
-
-		xhr.open('POST', serviceURL, true);
-
-		xhr.send(fileData);
-	}
 
 	let boardVue = new Vue({
 		el: '#board-vue',
@@ -197,7 +188,7 @@
 				$.post('/api/thread/{{this.board}}/', comment_post, function(response){
 					reply_response_object = JSON.parse(response);
 					var post_result_object = JSON.parse(response);
-					let images = document.getElementById('imageupload');
+					let images = document.getElementById('thumbnail');
 					let file = document.getElementById('fileupload');
 
 					boardVue._data.replies = [];
@@ -207,10 +198,7 @@
 					boardVue._data.thread_reply = '';
 
 						//upload image to /upload route
-					images.files[0].name = reply_response_object[reply_response_object.length-1].comment_UUID + '.' + images.files[0].name.split('.').pop();
-					file.innerHTML = images.files[0].name;
-					console.log('filename: ' + images.files[0].name)
-					uploadImage();
+					$('#upload').click();
 
 
 					return false;
@@ -239,6 +227,9 @@
 							var response_object = JSON.parse(response);
 							setTimeout(function(){
 								boardVue._data.post_comment_box = true;
+								setTimeout(function(){
+									imageHandler();
+								},20);
 							}, response_object.length*time_param + 150);
 							for(let i = 0;i<response_object.length; i++){
 								setTimeout(function(){
@@ -297,11 +288,108 @@
 	});
 
 		//prevents page refresh when you press enter while cursor is in the input field.
+
+	let imageHandler = function(){
+		var image_is_set = false;
+		var resize = function(){
+			console.log('resizing image');
+			var canvas = document.getElementById("thumbn");
+			var to_server = document.getElementById('image-to-server');
+			var ctx = canvas.getContext("2d");
+			var ctx2 = to_server.getContext("2d");
+			//var img = new Image();
+			var img = document.getElementById("img1");
+			var imgW = img.width;
+			var imgH = img.height;
+			var solidW = 100;
+			var solidH = 0;
+			if (solidW < imgW) {
+				solidH = imgH*(solidW/imgW);
+			} else {
+				solidW = imgW;
+				solidH = imgH;
+			}
+			canvas.width = solidW;
+			canvas.height = solidH;
+			to_server.width = imgW;
+			to_server.height = imgH;
+			ctx.drawImage(img,0, 0, solidW, solidH);
+			ctx2.drawImage(img, 0, 0, imgW, imgH);
+			console.log('height: ' + img.height + 'width: ' + img.width);
+			data = to_server.toDataURL('image/jpeg');
+		}
+
+		$('#btnCopy').click(resize());
+
+		$("#thumbnail").change(function(evt){
+			if (!window.FileReader) return;
+			var files = evt.target.files;
+			for (var i = 0, f; f = files[i]; i++) {
+				if (!f.type.match('image.*')) {
+				    alert("not an image file!");
+				    return;
+				}
+				var reader = new FileReader();
+				reader.onload = (function(theFile) {
+				    return function(e) {
+					// img 元素
+					document.getElementById('img1').src = e.target.result;
+				    };
+				})(f);
+				reader.readAsDataURL(f);
+			}
+			console.log('finishing uploading image to the page');
+			setTimeout(resize, 500)
+		});
+		$("#upload").click(function(){
+			image_is_set = true;
+			var canvas = document.getElementById("image-to-server");
+			//将图像输出为base64压缩的字符串  默认为image/png
+			var data = canvas.toDataURL("image/jpeg");
+			//如果没有缩小图片将不上传
+			console.log('canvas size: ' + data.length);
+			if(data.length > 100000){
+				image_is_set = false;
+				alert('image must be smaller than 900kb');
+			}
+
+			//删除字符串前的提示信息 "data:image/png;base64,"
+			var b64 = data.substring( 22 );
+			//POST到服务器上，生成图片
+			var re=/[\w\u4e00-\u9fa5]/ig;
+			var arr = ($("#thumbnail").val()).match(re);
+			var f_name = boardVue._data.replies[boardVue._data.replies.length-1].comment_UUID;
+			var board = '{{this.board}}';
+			var thread = boardVue._data.expanded_thread;
+
+			$.ajax({
+				type: 'POST',
+				url: '/api/boards/upload',
+				data: {
+					imgData: b64,
+					file_name: f_name,
+					board: board,
+					thread: thread
+				}
+
+			}).done(function( data ) {
+				alert(data);
+				let images = document.getElementById('thumbnail');
+				images = "";
+				$('canvas').each(function(){
+					this.width = 0;
+					this.height = 0;
+				})
+			});
+		});
+	}
+
 	$(document).ready(function(){
 		$('#main-container').css('cssText', 'margin-left: unset !important;');
 		$('#main-form').css('margin-left', '10vw');
 		$('#main-form').css('width', '60vw');
 		$('#main-form').css('margin-right', '10%');
+
 
 		$(document).keypress(function(e) {
 			if(e.which == 13) {
