@@ -59,13 +59,13 @@
 				<h5 class="ui center red inverted top attached header" style="border-radius: 0px; font-family: monospace; margin-left: -1px; margin-right: -38px; padding: 2px; font-size: 12px;"> #: ${comment.id} | TIME: ${comment.created} | UUID: ${comment.comment_UUID} </h5>
 				<div class="ui center inverted attached segment" style="border-radius: 0px; padding: 2em; margin-left: 36px; margin-right: -38px; text-align: center;">
 					<div v-if="comment.image_url" style="display: box;">
-						<img v-if="comment.expanded_image" style="max-width: 100%" v-on:click="toggle_expanded_image(comment.comment_UUID);" v-bind:src="comment.image_url">
-						<img style="max-width: 200px; max-height: 200px;" v-if="!comment.expanded_image" v-on:click="toggle_expanded_image(comment.comment_UUID);" v-bind:src="comment.image_url">
+						<img v-if="comment.expanded_image" class="disp_box" style="max-width: 100%" v-on:click="toggle_expanded_image(comment.comment_UUID);" v-bind:src="comment.image_url">
+						<img style="max-width: 200px; max-height: 200px;" class="disp_box" v-if="!comment.expanded_image" v-on:click="toggle_expanded_image(comment.comment_UUID);" v-bind:src="comment.image_url">
 					</div>
 
-					<p>
+					<blockquote>
 						${comment.post}
-					</p>
+					</blockquote>
 				</div>
 			</div>
 		</transition-group>
@@ -110,6 +110,10 @@
 
 #fileupload:hover {
     color: black;
+}
+
+.disp_box {
+	display: block !important;
 }
 
 .v-enter-active {
