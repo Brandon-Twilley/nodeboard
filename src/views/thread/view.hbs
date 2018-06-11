@@ -58,6 +58,11 @@
 			<div class="divided grid comment_post" style="margin-top: 1.5em; font-size: 12px; font-weight: normal !important;" :key="comment.comment_UUID" v-for="comment in replies">
 				<h5 class="ui center red inverted top attached header" style="border-radius: 0px; font-family: monospace; margin-left: -1px; margin-right: -38px; padding: 2px; font-size: 12px;"> #: ${comment.id} | TIME: ${comment.created} | UUID: ${comment.comment_UUID} </h5>
 				<div class="ui center inverted attached segment" style="border-radius: 0px; padding: 2em; margin-left: 36px; margin-right: -38px; text-align: center;">
+					<div v-if="comment.image_url" style="display: box;">
+						<img v-if="comment.expanded_image" style="max-width: 100%" v-on:click="toggle_expanded_image(comment.comment_UUID);" v-bind:src="comment.image_url">
+						<img style="max-width: 200px; max-height: 200px;" v-if="!comment.expanded_image" v-on:click="toggle_expanded_image(comment.comment_UUID);" v-bind:src="comment.image_url">
+					</div>
+
 					<p>
 						${comment.post}
 					</p>
@@ -191,14 +196,11 @@
 					let images = document.getElementById('thumbnail');
 					let file = document.getElementById('fileupload');
 
-					boardVue._data.replies = [];
-					for(var i = 0;i<reply_response_object.length;i++){
-						boardVue._data.replies.push(reply_response_object[i]);
-					}
-					boardVue._data.thread_reply = '';
+					boardVue._data.replies.push(reply_response_object[reply_response_object.length-1]);
 
 						//upload image to /upload route
 					$('#upload').click();
+					boardVue._data.thread_reply = "";
 
 
 					return false;
@@ -232,6 +234,7 @@
 								},20);
 							}, response_object.length*time_param + 150);
 							for(let i = 0;i<response_object.length; i++){
+								response_object[i].expanded_image = false;
 								setTimeout(function(){
 									boardVue._data.replies.push(response_object[i]);
 								}, i*time_param);
@@ -259,7 +262,22 @@
 						boardVue._data.single_thread_mode = false;
 					},reply_length*time_param + 600);
 				}
+			},
+			toggle_expanded_image(uuid){
+				var comments = boardVue._data.replies;
+				for(let i = 0;i<comments.length;i++){
+					if (comments[i].comment_UUID == uuid){
+						if(comments[i].expanded_image){
+							comments[i].expanded_image = false;
+						} else {
+							comments[i].expanded_image = true;
+						}
+						console.log('comment post: ' + comments[i].post);
+						console.log('comment render image: ' + comments[i].expanded_image);
+					}
+				}
 			}
+
 		},
 		mounted: function() {
 			let this_obj = this;
@@ -350,7 +368,8 @@
 			console.log('canvas size: ' + data.length);
 			if(data.length > 100000){
 				image_is_set = false;
-				alert('image must be smaller than 900kb');
+				alert('image must be smaller than 50kb');
+				return;
 			}
 
 			//删除字符串前的提示信息 "data:image/png;base64,"
@@ -370,16 +389,27 @@
 					file_name: f_name,
 					board: board,
 					thread: thread
+				},
+				success: function(){
+					let images = document.getElementById('thumbnail');
+					images = "";
+					$('canvas').each(function(){
+						this.width = 0;
+						this.height = 0;
+					});
 				}
-
 			}).done(function( data ) {
-				alert(data);
+				if(boardVue._data.replies.length != 0){
+					boardVue._data.replies[boardVue._data.replies.length-1].image_url = data;
+				}
 				let images = document.getElementById('thumbnail');
 				images = "";
 				$('canvas').each(function(){
 					this.width = 0;
 					this.height = 0;
 				})
+			}).fail(function(){
+				alert('failed response');
 			});
 		});
 	}

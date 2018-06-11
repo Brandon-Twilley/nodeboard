@@ -51,6 +51,7 @@ router.post('/api/boards/add', function(request, response, next){
 router.post('/api/boards/upload', function(req, res, next){
 	// create an incoming form object
 	var d = domain.create();
+	console.log('received upload');
 	d.on('error', console.error);
 	d.run(function() {
 		var file_name = req.body.file_name + ".jpeg";
@@ -61,11 +62,13 @@ router.post('/api/boards/upload', function(req, res, next){
 		//fs.writeFileSync(target_path, bitmap);
 		//fs.writeFileSync(target_path, bitmap);
 		fs.writeFile(target_path, bitmap, function(){
-			imgur.upload(path.join(__dirname + '../../../../../image_store', file_name), function(err, res){
-		          console.log('link: ', res.data.link);
-		          image_url = res.data.link;
+			imgur.upload(path.join(__dirname + '../../../../../image_store', file_name), function(err, imgur_response){
+		          console.log('link: ', imgur_response.data.link);
+		          image_url = imgur_response.data.link;
 				console.log('image url: ' + image_url);
 				init.set_image_url(image_url, req.body.board, req.body.thread, req.body.file_name);
+				res.send(image_url);
+				console.log('replied to upload');
 
 		     });
 		});
